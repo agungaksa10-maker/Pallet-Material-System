@@ -104,4 +104,77 @@ class AuthController extends Controller
 
         return redirect()->route('login')->with('info', 'Anda telah berhasil keluar dari sistem.');
     }
+
+    /**
+     * Show form to change or create a new password.
+     */
+    public function showChangePasswordForm(): View
+    {
+        $currentUser = Auth::user();
+        $allUsers = $currentUser->role === 'admin'
+            ? User::orderBy('name')->get(['id', 'user_id', 'name', 'role'])
+            : collect([$currentUser]);
+
+        return view('auth.change_password', [
+            'currentUser' => $currentUser,
+            'allUsers' => $allUsers,
+        ]);
+    }
+
+    /**
+     * Handle password update request.
+     */
+    public function updatePassword(Request $request): RedirectResponse
+    {
+        /** @var User $currentUser */
+        $currentUser = Auth::user();
+        $targetUserId = $request->input('target_user_id', $currentUser->user_id);
+
+        // Security check: Only admin can change password of another user
+        if ($targetUserId !== $currentUser->user_id && $currentUser->role !== 'admin') {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengubah password pengguna lain.');
+        }
+
+        $targetUser = User::where('user_id', $targetUserId)->firstOrFail();
+
+        // Validation rules
+        $rules = [
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
+        ];
+        $messages = [
+            'password.required' => 'Password baru wajib diisi.',
+            'password.min' => 'Password baru minimal harus 6 karakter.',
+            'password.confirmed' => 'Konfirmasi password baru tidak cocok.',
+            'current_password.required' => 'Password saat ini wajib diisi.',
+        ];
+
+        // If user is changing their own password and did not pass admin_override
+        if ($targetUserId === $currentUser->user_id && ! $request->boolean('admin_override')) {
+            $rules['current_password'] = ['required', 'string'];
+        }
+
+        $validated = $request->validate($rules, $messages);
+
+        // Verify current password if provided
+        if (isset($validated['current_password'])) {
+            $rawPass = $targetUser->getAuthPassword();
+            $isMatch = Hash::check($validated['current_password'], $rawPass) || hash_equals((string) $rawPass, (string) $validated['current_password']);
+
+            if (! $isMatch) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['current_password' => 'Password saat ini yang Anda masukkan salah.']);
+            }
+        }
+
+        // Update to new hashed password
+        $targetUser->password = Hash::make($validated['password']);
+        $targetUser->save();
+
+        $targetDesc = ($targetUser->user_id === $currentUser->user_id)
+            ? 'Password akun Anda'
+            : "Password untuk akun {$targetUser->name} ({$targetUser->user_id})";
+
+        return redirect()->route('password.change')->with('success', "{$targetDesc} berhasil diperbarui!");
+    }
 }

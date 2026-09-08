@@ -142,6 +142,23 @@
                             </span>
                         </a>
 
+                        <!-- 4. Buat Password Baru -->
+                        @php $isPassword = request()->routeIs('password.*'); @endphp
+                        <a href="{{ route('password.change') }}" 
+                           class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 {{ $isPassword ? 'bg-[#0047BA] text-white shadow-md shadow-blue-950/40 ring-1 ring-white/10' : 'text-slate-300 hover:text-white hover:bg-neutral-800/70' }}">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 rounded-lg flex items-center justify-center {{ $isPassword ? 'bg-white/20 text-white' : 'text-slate-400' }}">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                                    </svg>
+                                </div>
+                                <span class="tracking-tight text-[13px]">Buat Password Baru</span>
+                            </div>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-mono {{ $isPassword ? 'bg-white/20 text-white' : 'bg-neutral-800 text-slate-400' }}">
+                                Akun
+                            </span>
+                        </a>
+
                     </div>
                 </div>
 
@@ -161,17 +178,28 @@
                             </div>
                         </div>
 
-                        <!-- Logout Form -->
-                        <form method="POST" action="{{ route('logout') }}" class="inline shrink-0">
-                            @csrf
-                            <button type="submit" 
-                                    class="p-2 rounded-xl bg-neutral-800/80 hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 border border-neutral-700/60 hover:border-rose-500/30 transition shadow-xs"
-                                    title="Keluar dari sistem">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <!-- Change Password Quick Link -->
+                            <a href="{{ route('password.change') }}" 
+                               class="p-2 rounded-xl bg-neutral-800/80 hover:bg-blue-600/30 hover:text-blue-300 text-slate-400 border border-neutral-700/60 hover:border-blue-500/30 transition shadow-xs cursor-pointer"
+                               title="Buat / Ubah Password">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
                                 </svg>
-                            </button>
-                        </form>
+                            </a>
+
+                            <!-- Logout Form -->
+                            <form method="POST" action="{{ route('logout') }}" class="inline">
+                                @csrf
+                                <button type="submit" 
+                                        class="p-2 rounded-xl bg-neutral-800/80 hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 border border-neutral-700/60 hover:border-rose-500/30 transition shadow-xs cursor-pointer"
+                                        title="Keluar dari sistem">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 @endauth
             </div>
@@ -213,6 +241,8 @@
                                 <span class="text-slate-900 font-bold">Cari Komponen</span>
                             @elseif(request()->routeIs('master-materials.*'))
                                 <span class="text-slate-900 font-bold">Master Material &amp; Spare Part</span>
+                            @elseif(request()->routeIs('password.*'))
+                                <span class="text-slate-900 font-bold">Buat Password Baru</span>
                             @elseif(request()->routeIs('pallet.show'))
                                 <a href="{{ route('pallet.index') }}" class="hover:text-blue-600">Dashboard</a>
                                 <span class="mx-2 text-slate-300">/</span>

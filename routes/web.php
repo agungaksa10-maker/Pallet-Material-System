@@ -43,4 +43,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/master-materials/{id}', [MasterMaterialController::class, 'update'])->whereNumber('id')->name('master-materials.update');
     Route::delete('/master-materials/{id}', [MasterMaterialController::class, 'destroy'])->whereNumber('id')->name('master-materials.destroy');
     Route::get('/api/master-materials/search', [MasterMaterialController::class, 'search'])->name('api.master-materials.search');
+
+    // Password Management
+    Route::get('/password/change', [AuthController::class, 'showChangePasswordForm'])->name('password.change');
+    Route::post('/password/change', [AuthController::class, 'updatePassword'])->name('password.update');
 });
