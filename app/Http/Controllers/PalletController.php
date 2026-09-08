@@ -17,14 +17,10 @@ use Illuminate\View\View;
 class PalletController extends Controller
 {
     /**
-     * Available sites as required: OKI II, IKPD, IKPP, TELL, ISC
+     * Available site: OKI II
      */
     public const SITES = [
         'OKI II' => 'OKI Mill II (Ogan Komering Ilir)',
-        'IKPD' => 'IKPD (Indah Kiat Pulp & Paper - Perawang)',
-        'IKPP' => 'IKPP (Indah Kiat Pulp & Paper - Serang)',
-        'TELL' => 'TELL (Tjiwi Kimia - Sidoarjo)',
-        'ISC' => 'ISC (Integrated Supply Chain)',
     ];
 
     /**
@@ -177,7 +173,7 @@ class PalletController extends Controller
         ], [
             'pallet_number.min' => 'Nomor pallet minimal 1.',
             'pallet_number.max' => 'Nomor pallet maksimal 500.',
-            'site.in' => 'Site harus salah satu dari: OKI II, IKPD, IKPP, TELL, ISC.',
+            'site.in' => 'Site harus OKI II.',
             'category.in' => 'Kategori harus Dressing atau Consumable.',
         ]);
 
@@ -489,7 +485,7 @@ class PalletController extends Controller
         ], [
             'pallet_number.min' => 'Nomor pallet minimal 1.',
             'pallet_number.max' => 'Nomor pallet maksimal 500.',
-            'site.in' => 'Site harus salah satu dari: OKI II, IKPD, IKPP, TELL, ISC.',
+            'site.in' => 'Site harus OKI II.',
             'category.in' => 'Kategori harus Dressing atau Consumable.',
         ]);
 

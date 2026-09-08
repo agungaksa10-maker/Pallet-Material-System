@@ -71,10 +71,6 @@ class PalletSystemTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('OKI II');
-        $response->assertSee('IKPD');
-        $response->assertSee('IKPP');
-        $response->assertSee('TELL');
-        $response->assertSee('ISC');
         $response->assertSee('Dressing');
         $response->assertSee('Consumable');
         $response->assertSee('1 hingga 500');
@@ -148,10 +144,10 @@ class PalletSystemTest extends TestCase
     public function test_user_can_download_pdf_sticker(): void
     {
         $sticker = PalletSticker::create([
-            'site' => 'IKPD',
+            'site' => 'OKI II',
             'category' => 'Consumable',
             'pallet_number' => 77,
-            'pallet_code' => 'PLT-IKPD-CON-077',
+            'pallet_code' => 'PLT-OKI2-CON-077',
             'material_name' => 'Stretch Film Roll',
             'batch_no' => 'BATCH-20260904-077',
             'quantity' => '50 ROLL',
@@ -223,10 +219,10 @@ class PalletSystemTest extends TestCase
     public function test_user_can_view_edit_pallet_form(): void
     {
         $sticker = PalletSticker::create([
-            'site' => 'TELL',
+            'site' => 'OKI II',
             'category' => 'Consumable',
             'pallet_number' => 120,
-            'pallet_code' => 'PLT-TELL-CON-120',
+            'pallet_code' => 'PLT-OKI2-CON-120',
             'material_name' => 'Thermal Transfer Ribbon',
             'batch_no' => 'BATCH-20260904-120',
             'quantity' => '30 ROLL',
@@ -238,7 +234,7 @@ class PalletSystemTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Edit Sticker Pallet');
-        $response->assertSee('PLT-TELL-CON-120');
+        $response->assertSee('PLT-OKI2-CON-120');
         $response->assertSee('Thermal Transfer Ribbon');
         $response->assertSee('120');
     }
@@ -246,10 +242,10 @@ class PalletSystemTest extends TestCase
     public function test_user_can_update_pallet_sticker(): void
     {
         $sticker = PalletSticker::create([
-            'site' => 'IKPD',
+            'site' => 'OKI II',
             'category' => 'Dressing',
             'pallet_number' => 15,
-            'pallet_code' => 'PLT-IKPD-DRS-015',
+            'pallet_code' => 'PLT-OKI2-DRS-015',
             'material_name' => 'Diamond Tooling Old',
             'batch_no' => 'BATCH-OLD',
             'quantity' => '5 SET',
@@ -258,7 +254,7 @@ class PalletSystemTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user)->put("/pallet/{$sticker->id}", [
-            'site' => 'IKPD',
+            'site' => 'OKI II',
             'category' => 'Dressing',
             'pallet_number' => 16,
             'material_name' => 'Diamond Tooling Updated',
@@ -270,10 +266,10 @@ class PalletSystemTest extends TestCase
         $response->assertRedirect("/pallet/{$sticker->id}");
         $this->assertDatabaseHas('pallet_stickers', [
             'id' => $sticker->id,
-            'site' => 'IKPD',
+            'site' => 'OKI II',
             'category' => 'Dressing',
             'pallet_number' => 16,
-            'pallet_code' => 'PLT-IKPD-DRS-016',
+            'pallet_code' => 'PLT-OKI2-DRS-016',
             'material_name' => 'Diamond Tooling Updated',
             'quantity' => '12 SET',
             'batch_no' => 'BATCH-NEW-016',

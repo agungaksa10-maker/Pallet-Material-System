@@ -524,11 +524,7 @@
     let currentSearchTerm = '';
 
     const siteCodeMap = {
-        'OKI II': 'OKI2',
-        'IKPD': 'IKPD',
-        'IKPP': 'IKPP',
-        'TELL': 'TELL',
-        'ISC': 'ISC'
+        'OKI II': 'OKI2'
     };
 
     document.addEventListener('DOMContentLoaded', function () {

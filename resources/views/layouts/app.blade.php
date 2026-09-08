@@ -368,7 +368,7 @@
                         <span class="font-medium">&copy; {{ date('Y') }} Pallet Material System &middot; Manufacturing Operations Control</span>
                     </div>
                     <div class="flex items-center gap-3 text-slate-500 font-mono text-[11px]">
-                        <span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-200">Sites: OKI II &bull; IKPD &bull; IKPP &bull; TELL &bull; ISC</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-200">Site: OKI II (Ogan Komering Ilir)</span>
                         <span class="text-slate-300">&bull;</span>
                         <span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-200">Format Label: 100 &times; 150 mm</span>
                     </div>

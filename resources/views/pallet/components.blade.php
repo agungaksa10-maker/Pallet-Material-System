@@ -71,8 +71,8 @@
             </div>
             <div>
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Pabrik &amp; Fasilitas</span>
-                <div class="text-2xl font-black text-slate-900 tracking-tight">5 Site</div>
-                <span class="text-[11px] text-slate-400">OKI II, IKPD, IKPP, TELL, ISC</span>
+                <div class="text-2xl font-black text-slate-900 tracking-tight">OKI II</div>
+                <span class="text-[11px] text-slate-400">OKI Mill II (Ogan Komering Ilir)</span>
             </div>
         </div>
     </div>
@@ -109,56 +109,19 @@
                 </div>
             </div>
 
-            <!-- Site Filter Buttons -->
-            <div class="space-y-2">
-                <div class="flex items-center justify-between text-xs">
-                    <span class="font-bold text-slate-700 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-blue-600"></span>
-                        Filter Berdasarkan Site / Pabrik:
+            <!-- Site Info Badge -->
+            <div class="flex items-center gap-2 text-xs pt-1">
+                <span class="font-bold text-slate-700 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                    Fasilitas Produksi:
+                </span>
+                <span class="px-3 py-1 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-xs flex items-center gap-1.5">
+                    <span>OKI II</span>
+                    <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 text-white">
+                        {{ $totalComponents }} Komponen
                     </span>
-                    @if(!empty($selectedSite))
-                        <span class="font-mono text-[11px] text-blue-600 font-bold">Terpilih: {{ $selectedSite }}</span>
-                    @endif
-                </div>
-                
-                <div class="flex flex-wrap items-center gap-2">
-                    <a href="{{ route('pallet.components', array_merge(request()->query(), ['site' => ''])) }}" 
-                       class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 {{ empty($selectedSite) ? 'bg-blue-600 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
-                        <span>Semua Site</span>
-                        <span class="px-1.5 py-0.2 rounded-full text-[10px] {{ empty($selectedSite) ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600' }}">
-                            {{ $totalComponents }}
-                        </span>
-                    </a>
-
-                    @foreach($sites as $siteKey => $siteLabel)
-                        @php
-                            $isSelected = ($selectedSite === $siteKey);
-                            $badgeColor = match($siteKey) {
-                                'OKI II' => 'border-blue-300 text-blue-800 bg-blue-50 hover:bg-blue-100',
-                                'IKPD' => 'border-emerald-300 text-emerald-800 bg-emerald-50 hover:bg-emerald-100',
-                                'IKPP' => 'border-purple-300 text-purple-800 bg-purple-50 hover:bg-purple-100',
-                                'TELL' => 'border-amber-300 text-amber-800 bg-amber-50 hover:bg-amber-100',
-                                'ISC' => 'border-cyan-300 text-cyan-800 bg-cyan-50 hover:bg-cyan-100',
-                                default => 'border-slate-300 text-slate-800 bg-slate-50',
-                            };
-                            $activeColor = match($siteKey) {
-                                'OKI II' => 'bg-blue-600 text-white border-blue-600',
-                                'IKPD' => 'bg-emerald-600 text-white border-emerald-600',
-                                'IKPP' => 'bg-purple-600 text-white border-purple-600',
-                                'TELL' => 'bg-amber-600 text-white border-amber-600',
-                                'ISC' => 'bg-cyan-600 text-white border-cyan-600',
-                                default => 'bg-blue-600 text-white',
-                            };
-                        @endphp
-                        <a href="{{ route('pallet.components', array_merge(request()->query(), ['site' => $isSelected ? '' : $siteKey])) }}" 
-                           class="px-3.5 py-1.5 rounded-xl text-xs font-bold border transition flex items-center gap-1.5 {{ $isSelected ? $activeColor : $badgeColor }}">
-                            <span>{{ $siteKey }}</span>
-                            <span class="px-1.5 py-0.2 rounded-full text-[10px] {{ $isSelected ? 'bg-white/20 text-white' : 'bg-white/60 text-slate-700' }}">
-                                {{ $siteCounts[$siteKey] ?? 0 }}
-                            </span>
-                        </a>
-                    @endforeach
-                </div>
+                </span>
+                <span class="text-[11px] text-slate-500 font-mono">OKI Mill II</span>
             </div>
 
         </form>
