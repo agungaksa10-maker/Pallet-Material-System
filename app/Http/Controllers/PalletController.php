@@ -77,7 +77,12 @@ class PalletController extends Controller
                     ->orWhere('material_name', 'like', "%{$search}%")
                     ->orWhere('batch_no', 'like', "%{$search}%")
                     ->orWhere('notes', 'like', "%{$search}%")
-                    ->orWhere('pallet_number', (int) $search);
+                    ->orWhere('pallet_number', (int) $search)
+                    ->orWhereHas('components', function ($cq) use ($search) {
+                        $cq->where('component_name', 'like', "%{$search}%")
+                            ->orWhere('batch_no', 'like', "%{$search}%")
+                            ->orWhere('notes', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -213,9 +218,9 @@ class PalletController extends Controller
         }
 
         $componentNames = array_column($componentsData, 'component_name');
-        $summaryMaterial = count($componentNames) > 1
-            ? implode(', ', array_slice($componentNames, 0, 2)).(count($componentNames) > 2 ? ' (+'.(count($componentNames) - 2).' lainnya)' : '')
-            : ($componentNames[0] ?? 'Standard Material');
+        $summaryMaterial = count($componentNames) > 0
+            ? implode(', ', $componentNames)
+            : 'Standard Material';
 
         $sticker = DB::transaction(function () use ($validated, $palletCode, $summaryMaterial, $batchNo, $userId, $componentsData) {
             $record = PalletSticker::create([
@@ -495,9 +500,9 @@ class PalletController extends Controller
         }
 
         $componentNames = array_column($componentsData, 'component_name');
-        $summaryMaterial = count($componentNames) > 1
-            ? implode(', ', array_slice($componentNames, 0, 2)).(count($componentNames) > 2 ? ' (+'.(count($componentNames) - 2).' lainnya)' : '')
-            : ($componentNames[0] ?? 'Standard Material');
+        $summaryMaterial = count($componentNames) > 0
+            ? implode(', ', $componentNames)
+            : 'Standard Material';
 
         DB::transaction(function () use ($sticker, $validated, $palletCode, $summaryMaterial, $batchNo, $componentsData) {
             $sticker->update([

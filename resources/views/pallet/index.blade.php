@@ -277,12 +277,19 @@
                                 default => 'bg-slate-600',
                             };
                             $noteText = $item->notes ?: $item->components->pluck('notes')->filter()->first();
+
+                            $hasComponents = $item->components && $item->components->isNotEmpty();
+                            $allComponentsList = $hasComponents ? $item->components : collect();
+                            $allComponentsNames = $hasComponents 
+                                ? $item->components->pluck('component_name')->filter()->implode(' ') 
+                                : $item->material_name;
+                            $allSearchableMaterial = strtolower($allComponentsNames . ' ' . $item->material_name);
                         @endphp
                         <tr class="pallet-row hover:bg-slate-50/80 transition-colors duration-150 group"
                             data-site="{{ $item->site }}"
                             data-category="{{ $item->category }}"
                             data-pallet="{{ $item->pallet_number }}"
-                            data-material="{{ strtolower($item->material_name) }}"
+                            data-material="{{ $allSearchableMaterial }}"
                             data-code="{{ strtolower($item->pallet_code) }}"
                             data-batch="{{ strtolower($item->batch_no) }}"
                             data-notes="{{ strtolower($noteText ?? '') }}">
@@ -313,9 +320,31 @@
                                 <span class="text-[10px] text-slate-400 font-medium">/500</span>
                             </td>
 
-                            <!-- Nama Material -->
+                            <!-- Nama Material (Tampil Semua Komponen / Material) -->
                             <td class="py-3.5 px-4 font-bold text-slate-900">
-                                {{ $item->material_name }}
+                                @if($hasComponents && $allComponentsList->count() > 1)
+                                    <div class="space-y-1.5 py-0.5">
+                                        @foreach($allComponentsList as $comp)
+                                            <div class="flex items-start gap-1.5 text-xs text-slate-900 font-bold leading-snug">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0 mt-1.5"></span>
+                                                <div>
+                                                    <span>{{ $comp->component_name }}</span>
+                                                    @if(!empty($comp->quantity) && $comp->quantity !== '1' && $comp->quantity !== '1 PALLET')
+                                                        <span class="text-[10px] font-mono font-semibold text-slate-500 ml-1">({{ $comp->quantity }})</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @elseif($hasComponents && $allComponentsList->count() === 1)
+                                    <div class="text-xs font-bold text-slate-900 leading-snug">
+                                        {{ $allComponentsList->first()->component_name }}
+                                    </div>
+                                @else
+                                    <div class="text-xs font-bold text-slate-900 leading-snug">
+                                        {{ $item->material_name }}
+                                    </div>
+                                @endif
                             </td>
 
                             <!-- Catatan -->
