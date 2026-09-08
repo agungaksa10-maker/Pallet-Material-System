@@ -39,7 +39,11 @@ class AuthController extends Controller
         $userId = trim($validated['user_id']);
         $password = $validated['password'];
 
-        $user = User::where('user_id', $userId)->first();
+        $user = User::where('user_id', $userId)
+            ->orWhere('name', $userId)
+            ->orWhereRaw('LOWER(user_id) = ?', [strtolower($userId)])
+            ->orWhereRaw('LOWER(name) = ?', [strtolower($userId)])
+            ->first();
 
         if ($user) {
             $rawPass = $user->getAuthPassword();
@@ -64,10 +68,10 @@ class AuthController extends Controller
                     );
                 }
             } else {
-                $matched = Auth::attempt(['user_id' => $userId, 'password' => $password], $request->boolean('remember'));
+                $matched = Auth::attempt(['user_id' => $user->user_id, 'password' => $password], $request->boolean('remember'));
 
                 // Fallback for default admin accounts (e.g. admin123, 123456, password)
-                if (! $matched && in_array($userId, ['admin_andritz', 'admin'])) {
+                if (! $matched && in_array($user->user_id, ['admin_andritz', 'admin'])) {
                     if (in_array($password, ['admin123', '123456', 'admin', 'password', 'andritz'])) {
                         Auth::login($user, $request->boolean('remember'));
                         $matched = true;

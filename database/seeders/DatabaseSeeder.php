@@ -58,6 +58,16 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        User::updateOrCreate(
+            ['user_id' => 'andritztk_oki2'],
+            [
+                'name' => 'Andritztk OKI II',
+                'email' => 'andritztk.oki2@pallet-system.local',
+                'password' => Hash::make('oki123'),
+                'role' => 'operator',
+            ]
+        );
+
         // Sample initial pallet sticker records across all sites with multi-components
         $samples = [
             [
