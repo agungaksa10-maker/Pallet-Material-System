@@ -253,7 +253,7 @@
                         <th class="py-3 px-4">Catatan</th>
                         <th class="py-3 px-4">Jumlah</th>
                         <th class="py-3 px-4">Operator</th>
-                        <th class="py-3 px-4">Waktu Cetak</th>
+                        <th class="py-3 px-4">Waktu Pembuatan</th>
                         <th class="py-3 px-4 text-right">Aksi</th>
                     </tr>
                 </thead>
