@@ -8,7 +8,7 @@
     <!-- ======================================================== -->
     <!-- 1. METRICS & KPI HERO SECTION (INDUSTRIAL HIGH-PRECISION)-->
     <!-- ======================================================== -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         <!-- Total Pallet Card -->
         <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs hover:shadow-md hover:border-blue-400 transition-all duration-200 relative overflow-hidden group">
@@ -35,6 +35,37 @@
                     <div class="bg-gradient-to-r from-blue-600 to-indigo-600 h-full rounded-full transition-all duration-500" 
                          style="width: {{ min(100, max(2, ($totalPallet / 500) * 100)) }}%"></div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Semua Site Card (Tepat di Sebelah Total Pallet) -->
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs hover:shadow-md hover:border-emerald-400 transition-all duration-200 relative overflow-hidden group">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Semua Site</span>
+                <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 21h18M3 7v14M21 7v14M6 11h2M6 15h2M11 11h2M11 15h2M16 11h2M16 15h2M9 3h6v4H9z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+                <span class="text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiTotalSite">{{ $totalSite }}</span>
+                <span class="text-xs font-semibold text-slate-500">{{ count($sites) > 1 ? 'Pabrik aktif' : 'Fasilitas aktif' }}</span>
+            </div>
+            <div class="mt-3 flex flex-wrap gap-1">
+                @foreach($sites as $siteKey => $siteDesc)
+                    @php
+                        $sitePillStyle = match($siteKey) {
+                            'OKI II' => 'bg-blue-50 text-blue-700 border-blue-200',
+                            'IKPD' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                            'IKPP' => 'bg-purple-50 text-purple-700 border-purple-200',
+                            'TELL' => 'bg-amber-50 text-amber-700 border-amber-200',
+                            'ISC' => 'bg-cyan-50 text-cyan-700 border-cyan-200',
+                            default => 'bg-slate-50 text-slate-700 border-slate-200',
+                        };
+                    @endphp
+                    <span class="text-[10px] font-semibold px-2 py-0.5 rounded-md border {{ $sitePillStyle }}">{{ $siteKey }}</span>
+                @endforeach
             </div>
         </div>
 
@@ -93,7 +124,7 @@
                     <span>Filter & Manajemen Data Pallet</span>
                 </h2>
                 <p class="text-xs text-slate-500 mt-0.5">
-                    Pilih kategori di bawah untuk menyaring data pada tabel secara real-time:
+                    Pilih site atau kategori di bawah untuk menyaring data pada tabel secara real-time:
                 </p>
             </div>
 
@@ -109,48 +140,87 @@
             </div>
         </div>
 
-        <!-- Filter Buttons & Search Controls -->
-        <div class="flex flex-wrap items-center gap-2" id="filterContainer">
+        <!-- Filter Controls & Search Bar (Clean Single Row on Desktop) -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3" id="filterContainer">
             
-            <!-- 1. Kategori Filter (Semua Kategori, Dressing, Consumable) -->
-            <div class="inline-flex items-center rounded-xl bg-slate-100 p-1 border border-slate-200/80">
-                <button type="button" 
-                        onclick="onCategoryFilterChange('ALL')" 
-                        id="btn_cat_ALL"
-                        class="cat-filter-btn px-3 py-1 rounded-lg text-xs font-bold transition-all bg-white text-blue-700 shadow-xs">
-                    Semua Kategori
-                </button>
-                <button type="button" 
-                        onclick="onCategoryFilterChange('Dressing')" 
-                        id="btn_cat_Dressing"
-                        class="cat-filter-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 hover:text-indigo-600 transition-all flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
-                    <span>Dressing</span>
-                </button>
-                <button type="button" 
-                        onclick="onCategoryFilterChange('Consumable')" 
-                        id="btn_cat_Consumable"
-                        class="cat-filter-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 hover:text-amber-600 transition-all flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
-                    <span>Consumable</span>
-                </button>
+            <div class="flex flex-wrap items-center gap-2.5">
+                <!-- 1. Site Dropdown Filter -->
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10 text-slate-500">
+                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                    </div>
+                    <select id="siteFilterSelect" 
+                            onchange="onSiteFilterChange(this.value)" 
+                            class="pl-9 pr-8 py-2 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition cursor-pointer appearance-none shadow-2xs">
+                        <option value="ALL">Semua Site</option>
+                        @foreach($sites as $siteKey => $siteDesc)
+                            <option value="{{ $siteKey }}">{{ $siteKey }}</option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-slate-400">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Separator -->
+                <span class="hidden sm:inline-block w-px h-6 bg-slate-200 mx-0.5"></span>
+
+                <!-- 2. Kategori Filter (Semua Kategori, Dressing, Consumable) -->
+                <div class="inline-flex items-center rounded-xl bg-slate-100 p-1 border border-slate-200/80 gap-0.5">
+                    <button type="button" 
+                            onclick="onCategoryFilterChange('ALL')" 
+                            id="btn_cat_ALL"
+                            class="cat-filter-btn px-3 py-1 rounded-lg text-xs font-bold transition-all bg-white text-blue-700 shadow-xs">
+                        Semua Kategori
+                    </button>
+                    <button type="button" 
+                            onclick="onCategoryFilterChange('Dressing')" 
+                            id="btn_cat_Dressing"
+                            class="cat-filter-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 hover:text-indigo-600 transition-all flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
+                        <span>Dressing</span>
+                    </button>
+                    <button type="button" 
+                            onclick="onCategoryFilterChange('Consumable')" 
+                            id="btn_cat_Consumable"
+                            class="cat-filter-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 hover:text-amber-600 transition-all flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
+                        <span>Consumable</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- Live Search Bar -->
-            <div class="ml-auto w-full sm:w-80 md:w-96 lg:w-[420px] relative mt-2 sm:mt-0">
-                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            <!-- 3. Live Search Bar (Fixed layout & perfectly aligned icon) -->
+            <div class="relative w-full sm:w-72 md:w-80 lg:w-96 shrink-0">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-10 text-slate-400">
+                    <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
                 </div>
                 <input type="text" 
                        id="liveSearchInput" 
                        oninput="onSearchChange(this.value)"
                        placeholder="Cari nomor, material, batch, catatan..." 
-                       class="w-full pl-10 pr-4 py-2 bg-slate-50 hover:bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all shadow-xs">
+                       class="w-full pl-10 pr-4 py-2 bg-slate-50 hover:bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all shadow-xs leading-normal">
             </div>
 
+        </div>
+
+        <!-- Filter Status Bar -->
+        <div class="flex items-center justify-between text-xs pt-2 text-slate-500 border-t border-slate-100">
+            <div class="flex items-center gap-2">
+                <span class="font-medium text-slate-600">Status filter:</span>
+                <span id="activeFilterBadge" class="font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-lg text-[11px]">
+                    Semua Site • Semua Kategori
+                </span>
+            </div>
+            <div class="text-[11px] text-slate-500 font-mono">
+                Menampilkan <span id="visibleRowCount" class="font-bold text-slate-900">{{ count($stickers) }}</span> dari {{ count($stickers) }} baris data
+            </div>
         </div>
 
     </div>
@@ -481,7 +551,7 @@
                 <label class="block text-xs font-bold text-slate-800 mb-1">Pilih Site</label>
                 <select name="site" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-blue-600">
                     @foreach($sites as $siteKey => $siteDesc)
-                        <option value="{{ $siteKey }}">{{ $siteKey }} ({{ $siteDesc }})</option>
+                        <option value="{{ $siteKey }}">{{ $siteKey }}</option>
                     @endforeach
                 </select>
             </div>
@@ -524,7 +594,11 @@
     let currentSearchTerm = '';
 
     const siteCodeMap = {
-        'OKI II': 'OKI2'
+        'OKI II': 'OKI2',
+        'IKPD': 'IKPD',
+        'IKPP': 'IKPP',
+        'TELL': 'TELL',
+        'ISC': 'ISC'
     };
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -549,6 +623,10 @@
 
     function onSiteFilterChange(siteVal) {
         currentSite = siteVal;
+        const siteSelect = document.getElementById('siteFilterSelect');
+        if (siteSelect && siteSelect.value !== siteVal) {
+            siteSelect.value = siteVal;
+        }
         updateFilterBadge();
         filterTableRows();
     }
@@ -580,8 +658,6 @@
     function applyFilter(val, type = 'site') {
         if (type === 'site') {
             onSiteFilterChange(val);
-            const siteSelect = document.getElementById('siteFilterSelect');
-            if (siteSelect) siteSelect.value = val;
         } else if (type === 'category') {
             onCategoryFilterChange(val);
         }
@@ -609,15 +685,15 @@
         const badge = document.getElementById('activeFilterBadge');
         if (!badge) return;
 
-        if (currentCategory === 'ALL') {
-            badge.innerText = 'Semua Kategori (Seluruh Data)';
+        const siteText = (currentSite === 'ALL') ? 'Semua Site' : 'Site: ' + currentSite;
+        const catText = (currentCategory === 'ALL') ? 'Semua Kategori' : 'Kategori: ' + currentCategory;
+
+        if (currentSite === 'ALL' && currentCategory === 'ALL') {
+            badge.innerText = 'Semua Site • Semua Kategori (Seluruh Data)';
             badge.className = 'font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-lg text-[11px]';
-        } else if (currentCategory === 'Dressing') {
-            badge.innerText = 'Kategori: Dressing';
-            badge.className = 'font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-lg text-[11px]';
         } else {
-            badge.innerText = 'Kategori: Consumable';
-            badge.className = 'font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-lg text-[11px]';
+            badge.innerText = `${siteText} • ${catText}`;
+            badge.className = 'font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-lg text-[11px]';
         }
     }
 

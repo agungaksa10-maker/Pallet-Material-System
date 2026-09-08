@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MasterMaterial;
 use App\Models\PalletComponent;
 use App\Models\PalletSticker;
+use App\Models\User;
 use App\Services\BarcodeService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
@@ -17,11 +18,38 @@ use Illuminate\View\View;
 class PalletController extends Controller
 {
     /**
-     * Available site: OKI II
+     * All available production sites (Accessible by Admin).
      */
     public const SITES = [
         'OKI II' => 'OKI Mill II (Ogan Komering Ilir)',
+        'IKPD' => 'IKPD (Indah Kiat Pulp & Paper - Perawang)',
+        'IKPP' => 'IKPP (Indah Kiat Pulp & Paper - Serang)',
+        'TELL' => 'TELL (Tjiwi Kimia - Sidoarjo)',
+        'ISC' => 'ISC (Integrated Supply Chain)',
     ];
+
+    /**
+     * Production sites allowed for Operator role.
+     */
+    public const OPERATOR_SITES = [
+        'OKI II' => 'OKI Mill II (Ogan Komering Ilir)',
+    ];
+
+    /**
+     * Get available sites for the specified or authenticated user.
+     * Admin gets all sites, operator gets OKI II only.
+     *
+     * @return array<string, string>
+     */
+    public static function getSitesForUser(?User $user = null): array
+    {
+        $user = $user ?? Auth::user();
+        if ($user && $user->role === 'admin') {
+            return self::SITES;
+        }
+
+        return self::OPERATOR_SITES;
+    }
 
     /**
      * Available categories: Dressing, Consumable
@@ -86,9 +114,12 @@ class PalletController extends Controller
             });
         }
 
+        $user = Auth::user();
+        $sitesForUser = self::getSitesForUser($user);
+
         // Specific KPI Statistics requested: Total Pallet, Total Site, Dressing, Consumable
         $totalPallet = PalletSticker::count();
-        $totalSite = count(self::SITES);
+        $totalSite = count($sitesForUser);
         $totalDressing = PalletSticker::where('category', 'Dressing')->count();
         $totalConsumable = PalletSticker::where('category', 'Consumable')->count();
 
@@ -98,7 +129,8 @@ class PalletController extends Controller
         $usedPalletNumbers = PalletSticker::getUsedPalletNumbers($selectedSite);
 
         return view('pallet.index', [
-            'sites' => self::SITES,
+            'sites' => $sitesForUser,
+            'allSites' => self::SITES,
             'categories' => self::CATEGORIES,
             'materialPresets' => self::MATERIAL_PRESETS,
             'selectedSite' => $selectedSite,
@@ -118,7 +150,14 @@ class PalletController extends Controller
      */
     public function create(Request $request): View
     {
-        $selectedSite = $request->query('site', 'OKI II');
+        $user = Auth::user();
+        $availableSites = self::getSitesForUser($user);
+
+        $selectedSite = $request->query('site');
+        if (! $selectedSite || ! array_key_exists($selectedSite, $availableSites)) {
+            $selectedSite = array_key_first($availableSites);
+        }
+
         $selectedCategory = $request->query('category', 'Dressing');
 
         // Automatically determine next sequential unused pallet for the selected site
@@ -126,12 +165,13 @@ class PalletController extends Controller
 
         // Precompute used pallets by site for dynamic JS switching
         $usedPalletsBySite = [];
-        foreach (array_keys(self::SITES) as $siteKey) {
+        foreach (array_keys($availableSites) as $siteKey) {
             $usedPalletsBySite[$siteKey] = PalletSticker::getUsedPalletNumbers($siteKey);
         }
 
         return view('pallet.create', [
-            'sites' => self::SITES,
+            'sites' => $availableSites,
+            'allSites' => self::SITES,
             'categories' => self::CATEGORIES,
             'materialPresets' => self::MATERIAL_PRESETS,
             'catalog' => self::SPAREPART_CATALOG,
@@ -149,8 +189,11 @@ class PalletController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $user = Auth::user();
+        $allowedSites = array_keys(self::getSitesForUser($user));
+
         $validated = $request->validate([
-            'site' => ['required', 'string', 'in:'.implode(',', array_keys(self::SITES))],
+            'site' => ['required', 'string', 'in:'.implode(',', $allowedSites)],
             'category' => ['required', 'string', 'in:'.implode(',', array_keys(self::CATEGORIES))],
             'pallet_number' => ['required', 'integer', 'min:1', 'max:500'],
             'material_name' => ['nullable', 'string', 'max:255'],
@@ -173,7 +216,9 @@ class PalletController extends Controller
         ], [
             'pallet_number.min' => 'Nomor pallet minimal 1.',
             'pallet_number.max' => 'Nomor pallet maksimal 500.',
-            'site.in' => 'Site harus OKI II.',
+            'site.in' => ($user && $user->role === 'admin')
+                ? 'Site harus salah satu dari: '.implode(', ', array_keys(self::SITES)).'.'
+                : 'Operator hanya diizinkan untuk Site OKI II.',
             'category.in' => 'Kategori harus Dressing atau Consumable.',
         ]);
 
@@ -439,15 +484,22 @@ class PalletController extends Controller
     public function edit(int $id): View
     {
         $sticker = PalletSticker::with('components')->findOrFail($id);
+        $user = Auth::user();
+        $availableSites = self::getSitesForUser($user);
+
+        if (! array_key_exists($sticker->site, $availableSites)) {
+            $availableSites[$sticker->site] = self::SITES[$sticker->site] ?? $sticker->site;
+        }
 
         $usedPalletsBySite = [];
-        foreach (array_keys(self::SITES) as $siteKey) {
+        foreach (array_keys($availableSites) as $siteKey) {
             $usedPalletsBySite[$siteKey] = PalletSticker::getUsedPalletNumbers($siteKey, $sticker->id);
         }
 
         return view('pallet.edit', [
             'sticker' => $sticker,
-            'sites' => self::SITES,
+            'sites' => $availableSites,
+            'allSites' => self::SITES,
             'categories' => self::CATEGORIES,
             'materialPresets' => self::MATERIAL_PRESETS,
             'catalog' => self::SPAREPART_CATALOG,
@@ -463,9 +515,14 @@ class PalletController extends Controller
     public function update(Request $request, int $id): RedirectResponse
     {
         $sticker = PalletSticker::findOrFail($id);
+        $user = Auth::user();
+        $allowedSites = array_keys(self::getSitesForUser($user));
+        if ($user?->role !== 'admin' && ! in_array($sticker->site, $allowedSites)) {
+            $allowedSites[] = $sticker->site;
+        }
 
         $validated = $request->validate([
-            'site' => ['required', 'string', 'in:'.implode(',', array_keys(self::SITES))],
+            'site' => ['required', 'string', 'in:'.implode(',', $allowedSites)],
             'category' => ['required', 'string', 'in:'.implode(',', array_keys(self::CATEGORIES))],
             'pallet_number' => ['required', 'integer', 'min:1', 'max:500'],
             'material_name' => ['nullable', 'string', 'max:255'],
@@ -485,7 +542,9 @@ class PalletController extends Controller
         ], [
             'pallet_number.min' => 'Nomor pallet minimal 1.',
             'pallet_number.max' => 'Nomor pallet maksimal 500.',
-            'site.in' => 'Site harus OKI II.',
+            'site.in' => ($user && $user->role === 'admin')
+                ? 'Site harus salah satu dari: '.implode(', ', array_keys(self::SITES)).'.'
+                : 'Operator hanya diizinkan untuk Site OKI II.',
             'category.in' => 'Kategori harus Dressing atau Consumable.',
         ]);
 
@@ -633,12 +692,16 @@ class PalletController extends Controller
             $siteCounts[$s] = PalletComponent::whereHas('palletSticker', fn ($q) => $q->where('site', $s))->count();
         }
 
+        $user = Auth::user();
+        $availableSites = self::getSitesForUser($user);
+
         return view('pallet.components', [
             'components' => $components,
             'search' => $search,
             'selectedSite' => $selectedSite,
             'selectedCategory' => $selectedCategory,
-            'sites' => self::SITES,
+            'sites' => $availableSites,
+            'allSites' => self::SITES,
             'categories' => self::CATEGORIES,
             'totalComponents' => $totalComponents,
             'totalPalletsWithComponents' => $totalPalletsWithComponents,

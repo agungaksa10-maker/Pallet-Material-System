@@ -63,36 +63,61 @@
                     <div class="flex items-center justify-between">
                         <label class="text-xs font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
                             <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                            <span>1. Site / Pabrik</span>
+                            <span>1. Pilih Site / Pabrik</span>
                             <span class="text-rose-500">*</span>
                         </label>
-                        <span class="text-[11px] text-blue-700 font-mono font-bold bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">Fasilitas: OKI II</span>
+                        @if(count($sites) > 1)
+                            <span class="text-[11px] text-slate-400 font-mono">{{ count($sites) }} Fasilitas Produksi</span>
+                        @else
+                            <span class="text-[11px] text-blue-700 font-mono font-bold bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">Fasilitas: OKI II</span>
+                        @endif
                     </div>
 
-                    <div class="max-w-md">
-                        @foreach($sites as $sKey => $sLabel)
-                            <label class="cursor-pointer block">
-                                <input type="radio" 
-                                       name="site" 
-                                       value="{{ $sKey }}" 
-                                       class="sr-only site-radio"
-                                       checked
-                                       onchange="onSiteChange('{{ $sKey }}')">
-                                <div class="site-tile p-3.5 rounded-xl border transition-all flex items-center gap-3 bg-blue-50/80 border-blue-500 text-blue-800 ring-2 ring-blue-500/20 shadow-xs">
-                                    <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-xs shadow-xs shrink-0 tracking-wider">
-                                        OKI
+                    @if(count($sites) > 1)
+                        {{-- Tampilan Admin: Seluruh 5 Site Pabrik --}}
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                            @foreach($sites as $sKey => $sLabel)
+                                <label class="cursor-pointer">
+                                    <input type="radio" 
+                                           name="site" 
+                                           value="{{ $sKey }}" 
+                                           class="sr-only site-radio"
+                                           {{ old('site', $sticker->site) === $sKey ? 'checked' : '' }}
+                                           onchange="onSiteChange('{{ $sKey }}')">
+                                    <div class="site-tile p-3 rounded-xl border text-center transition-all flex flex-col items-center justify-center gap-1 {{ old('site', $sticker->site) === $sKey ? 'bg-blue-50/80 border-blue-500 text-blue-800 ring-2 ring-blue-500/20 shadow-xs' : 'bg-slate-50/50 hover:bg-slate-100/80 border-slate-200 text-slate-700' }}">
+                                        <span class="font-extrabold text-xs tracking-tight">{{ $sKey }}</span>
+                                        <span class="text-[10px] text-slate-500 truncate w-full text-center">{{ explode(' ', $sLabel)[0] }}</span>
                                     </div>
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex items-center justify-between">
-                                            <span class="font-extrabold text-sm tracking-tight text-blue-900">{{ $sKey }}</span>
-                                            <span class="text-[10px] uppercase font-bold text-blue-700 bg-blue-100/80 px-2 py-0.5 rounded-md">Aktif</span>
+                                </label>
+                            @endforeach
+                        </div>
+                    @else
+                        {{-- Tampilan Operator: Khusus OKI II Saja --}}
+                        <div class="max-w-md">
+                            @foreach($sites as $sKey => $sLabel)
+                                <label class="cursor-pointer block">
+                                    <input type="radio" 
+                                           name="site" 
+                                           value="{{ $sKey }}" 
+                                           class="sr-only site-radio"
+                                           checked
+                                           onchange="onSiteChange('{{ $sKey }}')">
+                                    <div class="site-tile p-3.5 rounded-xl border transition-all flex items-center gap-3 bg-blue-50/80 border-blue-500 text-blue-800 ring-2 ring-blue-500/20 shadow-xs">
+                                        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-xs shadow-xs shrink-0 tracking-wider">
+                                            OKI
                                         </div>
-                                        <span class="text-[11px] text-slate-600 truncate block mt-0.5">{{ $sLabel }}</span>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center justify-between">
+                                                <span class="font-extrabold text-sm tracking-tight text-blue-900">{{ $sKey }}</span>
+                                                <span class="text-[10px] uppercase font-bold text-blue-700 bg-blue-100/80 px-2 py-0.5 rounded-md">Aktif</span>
+                                            </div>
+                                            <span class="text-[11px] text-slate-600 truncate block mt-0.5">{{ $sLabel }}</span>
+                                        </div>
                                     </div>
-                                </div>
-                            </label>
-                        @endforeach
-                    </div>
+                                </label>
+                            @endforeach
+                        </div>
+                    @endif
                     @error('site')
                         <p class="text-xs text-rose-600 font-semibold mt-1">{{ $message }}</p>
                     @enderror
@@ -1047,9 +1072,20 @@
         });
     }
 
-    const siteCodeMap = {
-        'OKI II': 'OKI2'
-    };
+    @php
+        $siteMap = [];
+        foreach(array_keys($sites) as $s) {
+            $siteMap[$s] = match($s) {
+                'OKI II' => 'OKI2',
+                'IKPD' => 'IKPD',
+                'IKPP' => 'IKPP',
+                'TELL' => 'TELL',
+                'ISC' => 'ISC',
+                default => preg_replace('/[^A-Za-z0-9]/', '', $s)
+            };
+        }
+    @endphp
+    const siteCodeMap = @json($siteMap);
 
     function escapeHtml(str) {
         if (!str) return '';

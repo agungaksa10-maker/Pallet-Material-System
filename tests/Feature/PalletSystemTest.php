@@ -120,10 +120,35 @@ class PalletSystemTest extends TestCase
         $response = $this->actingAs($this->user)->get('/dashboard');
 
         $response->assertStatus(200);
+        $response->assertSee('Total Pallet');
+        $response->assertSee('Semua Site');
         $response->assertSee('OKI II');
         $response->assertSee('Dressing');
         $response->assertSee('Consumable');
         $response->assertSee('1 hingga 500');
+    }
+
+    public function test_admin_sees_all_five_site_filter_options_on_dashboard(): void
+    {
+        $admin = User::create([
+            'user_id' => 'admin_filter_test',
+            'name' => 'Admin Filter Test',
+            'email' => 'adminfilter@pallet.local',
+            'password' => Hash::make('admin123'),
+            'role' => 'admin',
+        ]);
+
+        $response = $this->actingAs($admin)->get('/dashboard');
+
+        $response->assertStatus(200);
+        $response->assertSee('Semua Site');
+        $response->assertSee('siteFilterSelect', false);
+        $response->assertSee('value="ALL"', false);
+        $response->assertSee('value="OKI II"', false);
+        $response->assertSee('value="IKPD"', false);
+        $response->assertSee('value="IKPP"', false);
+        $response->assertSee('value="TELL"', false);
+        $response->assertSee('value="ISC"', false);
     }
 
     public function test_pallet_number_must_be_between_1_and_500(): void
@@ -344,5 +369,86 @@ class PalletSystemTest extends TestCase
         $this->assertDatabaseMissing('pallet_stickers', [
             'id' => $sticker->id,
         ]);
+    }
+
+    public function test_admin_sees_all_five_sites_on_create_and_edit(): void
+    {
+        $admin = User::create([
+            'user_id' => 'admin_test',
+            'name' => 'Admin Test',
+            'email' => 'admin@pallet.local',
+            'password' => Hash::make('admin123'),
+            'role' => 'admin',
+        ]);
+
+        $createResponse = $this->actingAs($admin)->get('/pallet/create');
+        $createResponse->assertStatus(200);
+        $createResponse->assertSee('5 Fasilitas Produksi');
+        $createResponse->assertSee('OKI II');
+        $createResponse->assertSee('IKPD');
+        $createResponse->assertSee('IKPP');
+        $createResponse->assertSee('TELL');
+        $createResponse->assertSee('ISC');
+
+        $sticker = PalletSticker::create([
+            'site' => 'IKPD',
+            'category' => 'Dressing',
+            'pallet_number' => 88,
+            'pallet_code' => 'PLT-IKPD-DRS-088',
+            'material_name' => 'Test Dressing Unit',
+            'user_id' => $admin->id,
+        ]);
+
+        $editResponse = $this->actingAs($admin)->get("/pallet/{$sticker->id}/edit");
+        $editResponse->assertStatus(200);
+        $editResponse->assertSee('5 Fasilitas Produksi');
+        $editResponse->assertSee('IKPD');
+        $editResponse->assertSee('IKPP');
+        $editResponse->assertSee('TELL');
+        $editResponse->assertSee('ISC');
+    }
+
+    public function test_admin_can_create_pallet_for_any_of_the_five_sites(): void
+    {
+        $admin = User::create([
+            'user_id' => 'admin_tester_sites',
+            'name' => 'Admin Test 2',
+            'email' => 'admin2@pallet.local',
+            'password' => Hash::make('admin123'),
+            'role' => 'admin',
+        ]);
+
+        $sites = ['OKI II', 'IKPD', 'IKPP', 'TELL', 'ISC'];
+        foreach ($sites as $idx => $site) {
+            $num = 100 + $idx;
+            $response = $this->actingAs($admin)->post('/pallet', [
+                'site' => $site,
+                'category' => 'Consumable',
+                'pallet_number' => $num,
+                'material_name' => "Material for {$site}",
+            ]);
+
+            $response->assertSessionDoesntHaveErrors();
+            $this->assertDatabaseHas('pallet_stickers', [
+                'site' => $site,
+                'pallet_number' => $num,
+            ]);
+        }
+    }
+
+    public function test_operator_cannot_create_pallet_for_sites_other_than_oki_ii(): void
+    {
+        $forbiddenSites = ['IKPD', 'IKPP', 'TELL', 'ISC'];
+
+        foreach ($forbiddenSites as $idx => $forbiddenSite) {
+            $response = $this->actingAs($this->user)->post('/pallet', [
+                'site' => $forbiddenSite,
+                'category' => 'Consumable',
+                'pallet_number' => 200 + $idx,
+                'material_name' => 'Restricted Material',
+            ]);
+
+            $response->assertSessionHasErrors('site');
+        }
     }
 }
