@@ -312,7 +312,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'admin','System Administrator','admin@pallet-system.local',NULL,'$2y$12$TJdrAWKBNxctHuYgW9veSOpODvJLxYkv2rezGcpxHw8ZRcHuTMTc6','admin',NULL,'2026-09-04 00:03:43','2026-09-04 01:05:18'),(2,'operator01','Budi Santoso (Shift 1)','budi@pallet-system.local',NULL,'$2y$12$REeJ48yhVR5.qx0BTU1gqOMHfA4W3gXNBh69kTcCunrlop.ppWCrO','operator',NULL,'2026-09-04 00:03:43','2026-09-04 01:05:18'),(3,'operator02','Agus Pratama (Shift 2)','agus@pallet-system.local',NULL,'$2y$12$mcLDQpcqHL/hAwgXpaB9OOGfipiJJgUtuhjO1OQmfNcwv1/P3AWuS','operator',NULL,'2026-09-04 00:03:43','2026-09-04 01:05:18');
+INSERT INTO `users` VALUES (1,'admin','System Administrator','admin@pallet-system.local',NULL,'$2y$12$TJdrAWKBNxctHuYgW9veSOpODvJLxYkv2rezGcpxHw8ZRcHuTMTc6','admin',NULL,'2026-09-04 00:03:43','2026-09-04 01:05:18'),(2,'operator01','Budi Santoso (Shift 1)','budi@pallet-system.local',NULL,'$2y$12$REeJ48yhVR5.qx0BTU1gqOMHfA4W3gXNBh69kTcCunrlop.ppWCrO','operator',NULL,'2026-09-04 00:03:43','2026-09-04 01:05:18'),(3,'operator02','Agus Pratama (Shift 2)','agus@pallet-system.local',NULL,'$2y$12$mcLDQpcqHL/hAwgXpaB9OOGfipiJJgUtuhjO1OQmfNcwv1/P3AWuS','operator',NULL,'2026-09-04 00:03:43','2026-09-04 01:05:18'),(5,'Andritztk_OKI II','Andritztk OKI II','andritztk.oki2@pallet-system.local',NULL,'$2y$12$SK1IceaLj2PRnz0dmHGch.4g8VTQoVu0wD3ccXD.eongHqlY8pVP2','operator',NULL,'2026-09-08 20:47:39','2026-09-08 20:47:39');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

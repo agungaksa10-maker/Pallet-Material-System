@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\PalletSticker;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
@@ -63,6 +64,55 @@ class PalletSystemTest extends TestCase
 
         $response->assertRedirect('/dashboard');
         $this->assertAuthenticatedAs($this->user);
+    }
+
+    public function test_operator_can_login_with_andritztk_oki2_variations(): void
+    {
+        // 1. Test with exact screenshot input: Andritztk_OKI II
+        $response1 = $this->post('/login', [
+            'user_id' => 'Andritztk_OKI II',
+            'password' => 'oki123',
+        ]);
+        $response1->assertRedirect('/dashboard');
+        $this->assertAuthenticated();
+
+        Auth::logout();
+
+        // 2. Test with andritztk_oki2
+        $response2 = $this->post('/login', [
+            'user_id' => 'andritztk_oki2',
+            'password' => 'oki123',
+        ]);
+        $response2->assertRedirect('/dashboard');
+        $this->assertAuthenticated();
+
+        Auth::logout();
+
+        // 3. Test with space: Andritztk OKI II
+        $response3 = $this->post('/login', [
+            'user_id' => 'Andritztk OKI II',
+            'password' => 'oki123',
+        ]);
+        $response3->assertRedirect('/dashboard');
+        $this->assertAuthenticated();
+    }
+
+    public function test_operator_auto_provisions_on_server_if_account_does_not_exist_in_db(): void
+    {
+        User::where('user_id', 'like', '%Andritz%')->delete();
+        $this->assertDatabaseMissing('users', ['user_id' => 'Andritztk_OKI II']);
+
+        $response = $this->post('/login', [
+            'user_id' => 'Andritztk_OKI II',
+            'password' => 'oki123',
+        ]);
+
+        $response->assertRedirect('/dashboard');
+        $this->assertAuthenticated();
+        $this->assertDatabaseHas('users', [
+            'user_id' => 'Andritztk_OKI II',
+            'role' => 'operator',
+        ]);
     }
 
     public function test_authenticated_user_can_view_pallet_dashboard(): void

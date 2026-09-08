@@ -59,10 +59,20 @@ class DatabaseSeeder extends Seeder
         );
 
         User::updateOrCreate(
-            ['user_id' => 'andritztk_oki2'],
+            ['user_id' => 'Andritztk_OKI II'],
             [
                 'name' => 'Andritztk OKI II',
                 'email' => 'andritztk.oki2@pallet-system.local',
+                'password' => Hash::make('oki123'),
+                'role' => 'operator',
+            ]
+        );
+
+        User::updateOrCreate(
+            ['user_id' => 'andritztk_oki2'],
+            [
+                'name' => 'Andritztk OKI II',
+                'email' => 'andritztk.oki2.alias@pallet-system.local',
                 'password' => Hash::make('oki123'),
                 'role' => 'operator',
             ]
