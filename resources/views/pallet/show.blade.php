@@ -165,7 +165,7 @@
                         <table class="w-full text-xs text-left">
                             <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-bold border-b border-slate-200">
                                 <tr>
-                                    <th class="px-3.5 py-2.5 w-10 text-center">#</th>
+                                    <th class="px-3.5 py-2.5 w-10 text-center">NO</th>
                                     <th class="px-3.5 py-2.5">Nama Komponen / Material</th>
                                     <th class="px-3.5 py-2.5 w-28">Jumlah / Qty</th>
                                     <th class="px-3.5 py-2.5 w-36">Batch No</th>

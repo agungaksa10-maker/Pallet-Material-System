@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MasterMaterialController;
 use App\Http\Controllers\PalletController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,4 +34,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/pallet/{id}/edit', [PalletController::class, 'edit'])->whereNumber('id')->name('pallet.edit');
     Route::put('/pallet/{id}', [PalletController::class, 'update'])->whereNumber('id')->name('pallet.update');
     Route::delete('/pallet/{id}', [PalletController::class, 'destroy'])->whereNumber('id')->name('pallet.destroy');
+
+    // Master Material / Spare Part routes
+    Route::get('/master-materials', [MasterMaterialController::class, 'index'])->name('master-materials.index');
+    Route::post('/master-materials', [MasterMaterialController::class, 'store'])->name('master-materials.store');
+    Route::post('/master-materials/import', [MasterMaterialController::class, 'import'])->name('master-materials.import');
+    Route::get('/master-materials/template', [MasterMaterialController::class, 'downloadTemplate'])->name('master-materials.template');
+    Route::put('/master-materials/{id}', [MasterMaterialController::class, 'update'])->whereNumber('id')->name('master-materials.update');
+    Route::delete('/master-materials/{id}', [MasterMaterialController::class, 'destroy'])->whereNumber('id')->name('master-materials.destroy');
+    Route::get('/api/master-materials/search', [MasterMaterialController::class, 'search'])->name('api.master-materials.search');
 });

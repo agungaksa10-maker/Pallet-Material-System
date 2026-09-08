@@ -30,15 +30,6 @@
             </p>
         </div>
 
-        <div class="flex items-center gap-2.5">
-            <a href="{{ route('pallet.create') }}" 
-               class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold transition shadow-sm flex items-center gap-2 active:scale-98">
-                <svg class="w-4 h-4 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                </svg>
-                <span>Input Pallet Baru</span>
-            </a>
-        </div>
     </div>
 
     <!-- Metrics Summary Banner -->
@@ -170,68 +161,8 @@
                 </div>
             </div>
 
-            <!-- Category Filter Pills & Quick Sample Search -->
-            <div class="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-slate-100 text-xs">
-                <div class="flex items-center gap-2">
-                    <span class="text-slate-500 font-medium">Kategori:</span>
-                    <a href="{{ route('pallet.components', array_merge(request()->query(), ['category' => ''])) }}" 
-                       class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition {{ empty($selectedCategory) ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
-                        Semua
-                    </a>
-                    <a href="{{ route('pallet.components', array_merge(request()->query(), ['category' => 'Dressing'])) }}" 
-                       class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition {{ $selectedCategory === 'Dressing' ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100' }}">
-                        Dressing
-                    </a>
-                    <a href="{{ route('pallet.components', array_merge(request()->query(), ['category' => 'Consumable'])) }}" 
-                       class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition {{ $selectedCategory === 'Consumable' ? 'bg-amber-600 text-white' : 'bg-amber-50 text-amber-700 hover:bg-amber-100' }}">
-                        Consumable
-                    </a>
-                </div>
-
-                <!-- Example quick search chip -->
-                <div class="flex items-center gap-1.5 text-[11px] text-slate-500">
-                    <span>Contoh Cepat:</span>
-                    <a href="{{ route('pallet.components', ['search' => 'Knife Run', 'site' => 'IKPP']) }}" 
-                       class="px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium border border-blue-200 transition">
-                        Knife Run di Site IKPP
-                    </a>
-                    <a href="{{ route('pallet.components', ['search' => 'Roll Dressing', 'site' => 'OKI II']) }}" 
-                       class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">
-                        Roll Dressing di OKI II
-                    </a>
-                </div>
-            </div>
-
         </form>
     </div>
-
-    <!-- Active Search Filter Banner -->
-    @if(!empty($search) || !empty($selectedSite) || !empty($selectedCategory))
-        <div class="p-4 rounded-2xl bg-blue-50/80 border border-blue-200 text-blue-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-            <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.35-4.35"/>
-                </svg>
-                <span>
-                    Hasil pencarian: 
-                    @if(!empty($search))
-                        komponen <strong>"{{ $search }}"</strong>
-                    @endif
-                    @if(!empty($selectedSite))
-                        di Site <strong>{{ $selectedSite }}</strong>
-                    @endif
-                    @if(!empty($selectedCategory))
-                        kategori <strong>{{ $selectedCategory }}</strong>
-                    @endif
-                    &mdash; Ditemukan <strong>{{ $components->total() }}</strong> hasil di berbagai pallet.
-                </span>
-            </div>
-            <a href="{{ route('pallet.components') }}" class="text-blue-700 hover:text-blue-900 font-bold underline whitespace-nowrap">
-                Bersihkan Filter &times;
-            </a>
-        </div>
-    @endif
 
     <!-- Results Table / Cards -->
     <div class="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
@@ -253,11 +184,11 @@
                     <thead>
                         <tr class="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold text-[11px] uppercase tracking-wider">
                             <th class="py-3.5 px-4 sm:px-6">Nama Komponen</th>
-                            <th class="py-3.5 px-4">Nomor &amp; Kode Pallet</th>
+                            <th class="py-3.5 px-4">Nomor Pallet</th>
                             <th class="py-3.5 px-4">Site Pabrik</th>
                             <th class="py-3.5 px-4">Kategori</th>
-                            <th class="py-3.5 px-4">Jumlah &amp; Batch</th>
-                            <th class="py-3.5 px-4">Komponen Lain di Pallet Ini</th>
+                            <th class="py-3.5 px-4">Catatan</th>
+                            <th class="py-3.5 px-4">Jumlah</th>
                             <th class="py-3.5 px-4 text-right">Aksi</th>
                         </tr>
                     </thead>
@@ -282,21 +213,13 @@
                                         <span class="w-2 h-2 rounded-full bg-blue-500 shrink-0"></span>
                                         <span>{{ $item->component_name }}</span>
                                     </div>
-                                    @if($item->notes)
-                                        <p class="text-[11px] text-slate-500 mt-0.5 pl-4">{{ $item->notes }}</p>
-                                    @endif
                                 </td>
 
-                                <!-- Pallet Number & Code -->
+                                <!-- Pallet Number -->
                                 <td class="py-4 px-4 whitespace-nowrap">
-                                    <div class="flex items-center gap-2">
-                                        <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-lg bg-slate-900 text-white font-mono font-black text-xs shadow-xs">
-                                            Pallet #{{ $pallet?->pallet_number }}
-                                        </span>
-                                        <span class="font-mono text-[11px] text-slate-600 font-semibold">
-                                            {{ $pallet?->pallet_code }}
-                                        </span>
-                                    </div>
+                                    <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-lg bg-slate-900 text-white font-mono font-black text-xs shadow-xs">
+                                        Pallet #{{ $pallet?->pallet_number }}
+                                    </span>
                                 </td>
 
                                 <!-- Site -->
@@ -313,33 +236,23 @@
                                     </span>
                                 </td>
 
-                                <!-- Quantity & Batch -->
-                                <td class="py-4 px-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-800">{{ $item->quantity ?: '1 UNIT' }}</div>
-                                    <div class="text-[10px] font-mono text-slate-400 mt-0.5">{{ $item->batch_no ?: $pallet?->batch_no }}</div>
+                                <!-- Catatan Pallet -->
+                                <td class="py-4 px-4">
+                                    @php
+                                        $noteText = $pallet?->notes ?: $item->notes;
+                                    @endphp
+                                    @if(!empty($noteText))
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 max-w-[240px] truncate" title="{{ $noteText }}">
+                                            {{ $noteText }}
+                                        </span>
+                                    @else
+                                        <span class="text-slate-300 italic text-xs">&mdash;</span>
+                                    @endif
                                 </td>
 
-                                <!-- Other Components Sharing This Pallet -->
-                                <td class="py-4 px-4 max-w-[260px]">
-                                    @php
-                                        $otherComponents = $pallet ? $pallet->components->where('id', '!=', $item->id) : collect();
-                                    @endphp
-                                    @if($otherComponents->count() > 0)
-                                        <div class="flex flex-wrap gap-1">
-                                            @foreach($otherComponents->take(2) as $other)
-                                                <span class="text-[10px] font-medium px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 truncate max-w-[140px]" title="{{ $other->component_name }}">
-                                                    {{ $other->component_name }} ({{ $other->quantity }})
-                                                </span>
-                                            @endforeach
-                                            @if($otherComponents->count() > 2)
-                                                <span class="text-[10px] font-semibold text-slate-400 self-center">
-                                                    +{{ $otherComponents->count() - 2 }} lainnya
-                                                </span>
-                                            @endif
-                                        </div>
-                                    @else
-                                        <span class="text-slate-400 italic text-[11px]">&mdash; Hanya komponen ini</span>
-                                    @endif
+                                <!-- Quantity -->
+                                <td class="py-4 px-4 whitespace-nowrap">
+                                    <div class="font-bold text-slate-800">{{ $item->quantity ?: '1' }}</div>
                                 </td>
 
                                 <!-- Actions -->
@@ -364,6 +277,19 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
                                                 </svg>
                                             </a>
+
+                                            <!-- Hapus Pallet -->
+                                            <form method="POST" action="{{ route('pallet.destroy', $pallet->id) }}" onsubmit="return confirm('Hapus data pallet #{{ $pallet->pallet_number }} ({{ $pallet->pallet_code }})?')" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" 
+                                                        class="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition cursor-pointer"
+                                                        title="Hapus Pallet">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                    </svg>
+                                                </button>
+                                            </form>
                                         @endif
                                     </div>
                                 </td>

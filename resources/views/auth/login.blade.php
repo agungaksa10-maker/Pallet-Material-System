@@ -131,7 +131,7 @@
                                    required 
                                    autofocus
                                    autocomplete="username"
-                                   placeholder="admin atau operator01"
+                                   placeholder="Masukkan User ID"
                                    class="w-full pl-10 pr-3 py-2.5 text-xs bg-slate-950/80 border border-slate-700/90 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-[#007AC1] focus:ring-2 focus:ring-[#007AC1]/30 transition-all font-medium">
                         </div>
                     </div>
@@ -160,12 +160,12 @@
                                 </svg>
                             </div>
                             <input type="password" 
-                                   name="password" 
-                                   id="password" 
-                                   required 
-                                   autocomplete="current-password"
-                                   placeholder="Masukkan password"
-                                   class="w-full pl-10 pr-3 py-2.5 text-xs bg-slate-950/80 border border-slate-700/90 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-[#007AC1] focus:ring-2 focus:ring-[#007AC1]/30 transition-all font-medium">
+                                    name="password" 
+                                    id="password" 
+                                    required 
+                                    autocomplete="current-password"
+                                    placeholder="Masukkan password"
+                                    class="w-full pl-10 pr-3 py-2.5 text-xs bg-slate-950/80 border border-slate-700/90 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-[#007AC1] focus:ring-2 focus:ring-[#007AC1]/30 transition-all font-medium">
                         </div>
                     </div>
 
@@ -194,42 +194,6 @@
                 </form>
             </div>
 
-            <!-- Quick Demo Credentials Box -->
-            <div class="mt-4 bg-slate-900/70 border border-white/10 rounded-2xl p-3.5 text-xs backdrop-blur-xl shadow-lg">
-                <div class="text-[11px] font-bold text-slate-300 mb-2 flex items-center justify-between">
-                    <span class="flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-                        </svg>
-                        <span>Akun Terdaftar (Klik untuk Isi Cepat):</span>
-                    </span>
-                    <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#007AC1]/20 text-cyan-300 border border-[#007AC1]/30 font-semibold">
-                        1-KLIK
-                    </span>
-                </div>
-                <div class="grid grid-cols-2 gap-2.5">
-                    <button type="button" 
-                            onclick="fillCredentials('admin', 'password')"
-                            class="p-2.5 rounded-xl border border-slate-800 bg-slate-950/70 hover:border-[#007AC1]/60 hover:bg-[#007AC1]/10 text-left transition-all group">
-                        <div class="font-bold text-slate-200 text-xs group-hover:text-cyan-300 transition flex items-center justify-between">
-                            <span>admin</span>
-                            <span class="text-[9px] font-mono text-cyan-400/80 uppercase">SUPER</span>
-                        </div>
-                        <div class="text-[10px] font-mono text-slate-400 mt-0.5">password</div>
-                    </button>
-
-                    <button type="button" 
-                            onclick="fillCredentials('operator01', 'password123')"
-                            class="p-2.5 rounded-xl border border-slate-800 bg-slate-950/70 hover:border-[#007AC1]/60 hover:bg-[#007AC1]/10 text-left transition-all group">
-                        <div class="font-bold text-slate-200 text-xs group-hover:text-cyan-300 transition flex items-center justify-between">
-                            <span>operator01</span>
-                            <span class="text-[9px] font-mono text-slate-400 uppercase">OPERATOR</span>
-                        </div>
-                        <div class="text-[10px] font-mono text-slate-400 mt-0.5">password123</div>
-                    </button>
-                </div>
-            </div>
-
         </div>
 
     </main>
@@ -245,12 +209,6 @@
         function togglePasswordVisibility() {
             const pass = document.getElementById('password');
             pass.type = (pass.type === 'password') ? 'text' : 'password';
-        }
-
-        function fillCredentials(userId, pass) {
-            document.getElementById('user_id').value = userId;
-            document.getElementById('password').value = pass;
-            document.getElementById('user_id').focus();
         }
     </script>
 </body>

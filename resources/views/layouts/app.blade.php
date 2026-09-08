@@ -80,17 +80,6 @@
                 </button>
             </div>
 
-            <!-- Quick Create Button in Sidebar (Similar to + Add Menu in Screenshot) -->
-            <div class="p-4 border-b border-neutral-800/60 shrink-0">
-                <a href="{{ route('pallet.create') }}" 
-                   class="w-full py-2.5 px-3.5 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-orange-950/40 transition active:scale-98">
-                    <svg class="w-4 h-4 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    <span>+ Buat Sticker Baru</span>
-                </a>
-            </div>
-
             <!-- Navigation Links (Scrollable Container) -->
             <div class="flex-1 overflow-y-auto px-3.5 py-4 space-y-6">
 
@@ -129,69 +118,31 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                                     </svg>
                                 </div>
-                                <span class="tracking-tight text-[13px]">Buat Sticker Baru</span>
+                                <span class="tracking-tight text-[13px]">Buat Sticker Pallet Baru</span>
                             </div>
                             <span class="px-1.5 py-0.5 rounded text-[10px] font-mono {{ $isCreate ? 'bg-white/20 text-white' : 'bg-neutral-800 text-slate-400' }}">
                                 Multi
                             </span>
                         </a>
 
-                        <!-- 3. Cari Komponen di Pallet -->
-                        @php $isComponents = request()->routeIs('pallet.components'); @endphp
-                        <a href="{{ route('pallet.components') }}" 
-                           class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 {{ $isComponents ? 'bg-[#0047BA] text-white shadow-md shadow-blue-950/40 ring-1 ring-white/10' : 'text-slate-300 hover:text-white hover:bg-neutral-800/70' }}">
+                        <!-- 3. Master Material / Spare Part -->
+                        @php $isMaster = request()->routeIs('master-materials.*'); @endphp
+                        <a href="{{ route('master-materials.index') }}" 
+                           class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 {{ $isMaster ? 'bg-[#0047BA] text-white shadow-md shadow-blue-950/40 ring-1 ring-white/10' : 'text-slate-300 hover:text-white hover:bg-neutral-800/70' }}">
                             <div class="flex items-center gap-3">
-                                <div class="w-6 h-6 rounded-lg flex items-center justify-center {{ $isComponents ? 'bg-white/20 text-white' : 'text-slate-400' }}">
+                                <div class="w-6 h-6 rounded-lg flex items-center justify-center {{ $isMaster ? 'bg-white/20 text-white' : 'text-slate-400' }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                                     </svg>
                                 </div>
-                                <span class="tracking-tight text-[13px]">Cari Komponen di Pallet</span>
+                                <span class="tracking-tight text-[13px]">Master Material</span>
                             </div>
-                            <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold {{ $isComponents ? 'bg-white/20 text-white' : 'bg-blue-950 text-blue-400 border border-blue-800/50' }}">
-                                Cari
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold {{ $isMaster ? 'bg-white/20 text-white' : 'bg-neutral-800 text-slate-400' }}">
+                                Data
                             </span>
                         </a>
 
                     </div>
-                </div>
-
-                <!-- Site Facilities Shortcut Section -->
-                <div>
-                    <div class="px-3 pb-2 text-[10px] font-mono font-bold tracking-wider text-slate-500 uppercase flex items-center justify-between">
-                        <span>Pabrik &amp; Site (5)</span>
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    </div>
-                    <div class="space-y-1 text-xs">
-                        @foreach([
-                            'OKI II' => 'OKI Mill II',
-                            'IKPD' => 'IKPP Perawang',
-                            'IKPP' => 'IKPP Serang',
-                            'TELL' => 'Tjiwi Kimia',
-                            'ISC' => 'Indah Kiat Central'
-                        ] as $sCode => $sName)
-                            <a href="{{ route('pallet.components', ['site' => $sCode]) }}" 
-                               class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-neutral-800/60 transition group">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-2 h-2 rounded-full bg-neutral-600 group-hover:bg-blue-400 transition-colors"></span>
-                                    <span class="font-bold font-mono text-[12px] text-slate-300 group-hover:text-white">{{ $sCode }}</span>
-                                    <span class="text-[10px] text-slate-500 truncate max-w-[110px]">{{ $sName }}</span>
-                                </div>
-                                <span class="text-[10px] font-mono text-slate-600 group-hover:text-slate-400">&rarr;</span>
-                            </a>
-                        @endforeach
-                    </div>
-                </div>
-
-                <!-- System Info Box -->
-                <div class="p-3.5 rounded-xl bg-neutral-900/90 border border-neutral-800 text-[11px] space-y-1.5 text-slate-400 font-mono">
-                    <div class="text-white font-bold text-xs flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                        <span>Pallet Spec &amp; Range</span>
-                    </div>
-                    <div class="text-slate-400">Rentang No. Pallet: <strong class="text-slate-200 font-semibold">1 &ndash; 500</strong></div>
-                    <div class="text-slate-400">Kategori: <strong class="text-slate-200 font-semibold">Dressing &amp; Consumable</strong></div>
-                    <div class="text-slate-400">Barcode: <strong class="text-slate-200 font-semibold">Code 128 / QR</strong></div>
                 </div>
 
             </div>
@@ -201,8 +152,8 @@
                 @auth
                     <div class="flex items-center justify-between gap-2">
                         <div class="flex items-center gap-2.5 min-w-0">
-                            <div class="w-8 h-8 rounded-xl bg-blue-600/30 border border-blue-500/40 text-blue-400 font-black text-xs flex items-center justify-center shrink-0">
-                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                            <div class="h-8 px-2 bg-white rounded-xl border border-white/20 shadow-xs flex items-center justify-center shrink-0">
+                                <img src="{{ asset('images/andritz-logo.svg') }}" alt="ANDRITZ" class="h-3.5 w-auto object-contain">
                             </div>
                             <div class="flex flex-col min-w-0">
                                 <span class="text-xs font-bold text-white truncate leading-tight">{{ Auth::user()->name }}</span>
@@ -260,6 +211,8 @@
                                 <span class="text-slate-900 font-bold">Buat Sticker Baru</span>
                             @elseif(request()->routeIs('pallet.components'))
                                 <span class="text-slate-900 font-bold">Cari Komponen</span>
+                            @elseif(request()->routeIs('master-materials.*'))
+                                <span class="text-slate-900 font-bold">Master Material &amp; Spare Part</span>
                             @elseif(request()->routeIs('pallet.show'))
                                 <a href="{{ route('pallet.index') }}" class="hover:text-blue-600">Dashboard</a>
                                 <span class="mx-2 text-slate-300">/</span>
@@ -286,26 +239,6 @@
                             <span>5 Sites Active</span>
                         </div>
 
-                        <!-- Prominent Action Button (+ Add Menu style like reference screenshot) -->
-                        @if(!request()->routeIs('pallet.create'))
-                            <a href="{{ route('pallet.create') }}" 
-                               class="px-3.5 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-extrabold text-xs shadow-sm hover:shadow-md shadow-orange-600/20 transition flex items-center gap-1.5 active:scale-95">
-                                <svg class="w-4 h-4 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                                </svg>
-                                <span class="hidden sm:inline">+ Buat Sticker</span>
-                                <span class="sm:hidden">+ Baru</span>
-                            </a>
-                        @else
-                            <a href="{{ route('pallet.components') }}" 
-                               class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-sm hover:shadow-md shadow-blue-600/20 transition flex items-center gap-1.5 active:scale-95">
-                                <svg class="w-4 h-4 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                                </svg>
-                                <span class="hidden sm:inline">Cari Komponen</span>
-                                <span class="sm:hidden">Cari</span>
-                            </a>
-                        @endif
 
                     </div>
 
@@ -347,6 +280,25 @@
                             </div>
                         </div>
                         <button type="button" onclick="this.parentElement.remove()" class="text-blue-600 hover:text-blue-900 p-1 rounded-md hover:bg-blue-100 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="mb-4 flex items-center justify-between p-4 rounded-xl bg-rose-50/90 border border-rose-200 text-rose-900 text-xs shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-7 h-7 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="font-bold text-rose-950">Terjadi Kesalahan!</span>
+                                <span class="ml-1 text-rose-800">{{ session('error') }}</span>
+                            </div>
+                        </div>
+                        <button type="button" onclick="this.parentElement.remove()" class="text-rose-600 hover:text-rose-900 p-1 rounded-md hover:bg-rose-100 transition">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>

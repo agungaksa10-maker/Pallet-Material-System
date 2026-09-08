@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    <!-- Main Grid: Form on Left (7 cols), Live Thermal Label on Right (5 cols) -->
+    <!-- Main Grid: Form on Left (7 cols), Live Summary on Right (5 cols) -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
         <!-- ======================================================== -->
@@ -147,9 +147,6 @@
                             <span>3. Nomor Pallet (Unik &amp; Berurutan)</span>
                             <span class="text-rose-500">*</span>
                         </label>
-                        <span class="text-[11px] font-mono font-bold text-slate-600" id="palletCodePreviewText">
-                            PLT-{{ $selectedSite === 'OKI II' ? 'OKI2' : $selectedSite }}-CON-{{ str_pad($selectedPallet, 3, '0', STR_PAD_LEFT) }}
-                        </span>
                     </div>
 
                     <!-- Availability Status Alert -->
@@ -233,147 +230,290 @@
                     @enderror
                 </div>
 
-                <!-- 4. Multi-Komponen Dinamis (Bisa beberapa component dalam 1 pallet) -->
-                <div class="space-y-3 p-4 rounded-xl bg-slate-50/80 border border-slate-200/90">
-                    <div class="flex items-center justify-between">
+                <!-- 4. DAFTAR MATERIAL / SPARE PART PALLET (INPUT DATA ASLI) -->
+                <div class="space-y-4 p-4.5 rounded-2xl bg-slate-50/90 border border-slate-200/90 shadow-xs">
+                    
+                    <!-- Header Section -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-2 border-b border-slate-200">
                         <div>
-                            <label class="text-xs font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                                <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                                <span>4. Komponen &amp; Material Pallet</span>
+                            <label class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                                <span>DAFTAR MATERIAL / SPARE PART PALLET (INPUT DATA ASLI)</span>
                                 <span class="text-rose-500">*</span>
                             </label>
                             <p class="text-[11px] text-slate-500 mt-0.5">
-                                Pallet ini dapat diisi lebih dari 1 komponen. Tekan "+ Tambah Komponen" untuk memasukkan item berikutnya.
+                                Masukkan data asli material / spare part yang dimuat di pallet ini (bisa lebih dari 1 item).
                             </p>
                         </div>
-                        <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-bold" id="componentCounterBadge">
-                            1 Komponen
-                        </span>
-                    </div>
-
-                    <!-- Dynamic Component Rows Container -->
-                    <div id="componentsContainer" class="space-y-3 pt-1">
-                        <!-- Row 1 (Default) -->
-                        <div class="component-row p-3.5 bg-white border border-slate-200 rounded-xl shadow-xs space-y-2.5 transition relative">
-                            <div class="flex items-center justify-between text-xs font-bold text-slate-700">
-                                <span class="flex items-center gap-1.5">
-                                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                                    <span class="row-label">Komponen #1</span>
-                                </span>
-                                <button type="button" 
-                                        onclick="removeComponentRow(this)" 
-                                        class="text-rose-500 hover:text-rose-700 text-xs font-semibold remove-btn hidden">
-                                    &times; Hapus
-                                </button>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-                                <div class="sm:col-span-7">
-                                    <label class="text-[10px] font-bold text-slate-500 block mb-1">Nama Komponen / Material *</label>
-                                    <input type="text" 
-                                           name="components[0][component_name]" 
-                                           value="{{ old('components.0.component_name', old('material_name', $selectedCategory === 'Dressing' ? 'Knife Run' : 'Stretch Film Roll 500mm x 300m')) }}" 
-                                           required
-                                           oninput="refreshLivePreview()"
-                                           placeholder="Contoh: Knife Run, Roll Dressing, Diamond Stone..." 
-                                           class="w-full px-3 py-2 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition component-name-input">
-                                </div>
-
-                                <div class="sm:col-span-5">
-                                    <label class="text-[10px] font-bold text-slate-500 block mb-1">Jumlah / Qty</label>
-                                    <input type="text" 
-                                           name="components[0][quantity]" 
-                                           value="{{ old('components.0.quantity', '1 UNIT') }}" 
-                                           oninput="refreshLivePreview()"
-                                           placeholder="Contoh: 10 PCS, 2 UNIT" 
-                                           class="w-full px-3 py-2 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition component-qty-input">
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-                                <div class="sm:col-span-6">
-                                    <input type="text" 
-                                           name="components[0][batch_no]" 
-                                           value="{{ old('components.0.batch_no') }}" 
-                                           placeholder="No. Batch komponen (opsional)" 
-                                           class="w-full px-3 py-1.5 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-lg text-xs font-mono text-slate-700 focus:outline-none focus:border-blue-600 transition">
-                                </div>
-                                <div class="sm:col-span-6">
-                                    <input type="text" 
-                                           name="components[0][notes]" 
-                                           value="{{ old('components.0.notes') }}" 
-                                           placeholder="Catatan / Spesifikasi (opsional)" 
-                                           class="w-full px-3 py-1.5 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-blue-600 transition">
-                                </div>
-                            </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] font-mono font-bold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200" id="componentCountBadge">
+                                0 Item Ditambahkan
+                            </span>
                         </div>
                     </div>
 
-                    <!-- Button to Add Component Row -->
-                    <div class="pt-1 flex items-center justify-between gap-3">
-                        <button type="button" 
-                                onclick="addComponentRow()"
-                                class="px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-extrabold text-xs border border-blue-200 transition flex items-center gap-1.5 shadow-xs">
-                            <svg class="w-4 h-4 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                            </svg>
-                            <span>+ Tambah Komponen Lain di Pallet Ini</span>
-                        </button>
+                    <!-- Card Form Input Data Asli -->
+                    <div class="p-3.5 bg-white border border-blue-200 rounded-xl space-y-3 shadow-2xs">
+                        <div class="flex items-center justify-between text-xs font-bold text-slate-800">
+                            <span class="flex items-center gap-1.5 text-blue-900 font-extrabold">
+                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                <span>Tambah Material / Spare Part Asli</span>
+                            </span>
+                            <div class="flex items-center gap-2">
+                                <a href="{{ route('master-materials.index') }}" target="_blank" class="text-[11px] text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1 hover:underline">
+                                    <span>⚙️ Kelola Master Data</span>
+                                </a>
+                            </div>
+                        </div>
 
-                        <span class="text-[11px] text-slate-400 font-medium">Bisa diisi beberapa komponen</span>
-                    </div>
+                        <!-- Quick Search & Select from Master Data (Modern Interactive Combobox) -->
+                        <div class="relative bg-gradient-to-r from-blue-50/90 via-sky-50/40 to-indigo-50/40 rounded-xl p-3 border border-blue-200/90 shadow-2xs space-y-2.5">
+                            
+                            <!-- Top Bar: Title -->
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-xs">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                    </svg>
+                                </span>
+                                <div>
+                                    <span class="text-xs font-black text-slate-900 leading-tight">Cari Material dari Master Data</span>
+                                    <span class="text-[10px] text-slate-500 font-semibold ml-1.5 hidden sm:inline">({{ count($masterMaterials ?? []) }} item terdaftar)</span>
+                                </div>
+                            </div>
 
-                    <!-- Preset Chips to quick-add -->
-                    <div class="pt-2 border-t border-slate-200 space-y-1.5">
-                        <span class="text-[11px] text-slate-500 font-bold">Preset Komponen Cepat (Klik untuk Tambah):</span>
-                        <div class="flex flex-wrap gap-1.5" id="presetChipsContainer">
-                            @foreach($materialPresets[$selectedCategory] ?? [] as $presetItem)
-                                <button type="button" 
-                                        onclick="addPresetAsComponent('{{ addslashes($presetItem) }}')"
-                                        class="px-2.5 py-1 rounded-lg bg-white hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 border border-slate-200 text-slate-700 text-[11px] font-medium transition shadow-2xs">
-                                    + {{ $presetItem }}
-                                </button>
-                            @endforeach
-                            <!-- Popular Knife Run preset -->
+                            <!-- Live Instant Search Input & Dropdown -->
+                            <div class="relative" id="masterSearchWrapper">
+                                <div class="relative flex items-center">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-blue-600">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                        </svg>
+                                    </div>
+
+                                    <input type="text" 
+                                           id="masterQuickSearchInput" 
+                                           autocomplete="off"
+                                           onfocus="openMasterDropdown()" 
+                                           oninput="filterMasterMaterials(this.value)" 
+                                           onkeydown="handleMasterSearchKeydown(event)"
+                                           placeholder="Ketik Kode Part atau Nama Material (misal: 3009, Knife, TK IV, Roll, Blade)..." 
+                                           class="w-full pl-9 pr-24 py-2.5 bg-white border border-blue-300 rounded-xl text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 shadow-xs transition">
+
+                                    <div class="absolute inset-y-0 right-0 pr-2 flex items-center gap-1">
+                                        <button type="button" 
+                                                id="masterSearchClearBtn" 
+                                                onclick="clearMasterQuickSearch()" 
+                                                class="hidden p-1 text-slate-400 hover:text-slate-600 rounded-md transition"
+                                                title="Bersihkan pencarian">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                        <button type="button" 
+                                                onclick="toggleMasterDropdown()" 
+                                                class="px-2 py-1 text-[11px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition flex items-center gap-1 cursor-pointer">
+                                            <span>Pilih</span>
+                                            <svg class="w-3 h-3 transition-transform duration-200" id="masterChevronIcon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Floating Live Results Dropdown Container -->
+                                <div id="masterDropdownMenu" 
+                                     class="hidden absolute left-0 right-0 top-full mt-1.5 z-40 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+                                    
+                                    <!-- Category Quick Filter Chips inside Dropdown -->
+                                    <div class="px-3 py-2 bg-slate-50 border-b border-slate-100 flex items-center justify-between text-[11px]">
+                                        <div class="flex items-center gap-1">
+                                            <span class="text-slate-500 font-bold text-[10px] uppercase tracking-wider mr-1">Filter:</span>
+                                            <button type="button" onclick="setMasterDropdownCategory('ALL')" id="mChip_ALL" class="px-2 py-0.5 rounded-md font-bold text-[10px] bg-blue-600 text-white shadow-2xs">Semua (<span id="mCount_ALL">{{ count($masterMaterials ?? []) }}</span>)</button>
+                                            <button type="button" onclick="setMasterDropdownCategory('Dressing')" id="mChip_Dressing" class="px-2 py-0.5 rounded-md font-semibold text-[10px] bg-white border border-slate-200 text-slate-700 hover:bg-slate-100">Dressing</button>
+                                            <button type="button" onclick="setMasterDropdownCategory('Consumable')" id="mChip_Consumable" class="px-2 py-0.5 rounded-md font-semibold text-[10px] bg-white border border-slate-200 text-slate-700 hover:bg-slate-100">Consumable</button>
+                                        </div>
+                                        <span id="masterResultsCountText" class="text-[10px] text-slate-400 font-mono">{{ count($masterMaterials ?? []) }} item</span>
+                                    </div>
+
+                                    <!-- Scrollable Results List -->
+                                    <div id="masterDropdownList" class="max-h-64 overflow-y-auto divide-y divide-slate-100 text-xs">
+                                        <!-- Populated dynamically via JS -->
+                                    </div>
+
+                                    <!-- Dropdown Footer Info -->
+                                    <div class="px-3 py-1.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between text-[10.5px] text-slate-500">
+                                        <span class="flex items-center gap-1">
+                                            <kbd class="px-1 py-0.2 bg-slate-200 rounded text-[9px] font-mono">&uarr;&darr;</kbd> Navigasi &bull; <kbd class="px-1 py-0.2 bg-slate-200 rounded text-[9px] font-mono">Enter</kbd> Pilih
+                                        </span>
+                                        <button type="button" onclick="closeMasterDropdown()" class="hover:text-slate-800 font-semibold text-[10px]">Tutup [Esc]</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Selected Material Pill / Info Bar -->
+                            <div id="selectedMaterialPreviewBar" class="hidden p-2 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between gap-2 text-xs">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 text-[11px] font-bold">✓</span>
+                                    <div class="truncate">
+                                        <span class="text-emerald-950 font-extrabold" id="selectedMatNameText">-</span>
+                                        <span class="text-emerald-700 font-mono text-[11px] ml-1" id="selectedMatCodeText"></span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <span class="text-[10px] text-emerald-800 font-semibold bg-emerald-100 px-2 py-0.5 rounded-md">Terpilih ke form</span>
+                                    <button type="button" onclick="resetSelectedMaterialBar()" class="text-emerald-700 hover:text-rose-600 p-1" title="Batalkan pilihan master">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Hidden fallback select for backward-compatibility -->
+                            <select id="masterMaterialSelect" class="hidden">
+                                <option value="">--</option>
+                                @foreach(($masterMaterials ?? []) as $mm)
+                                    <option value="{{ $mm->id }}">
+                                        {{ $mm->item_code ? '['.$mm->item_code.'] ' : '' }}{{ $mm->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs">
+                            <!-- ID Material -->
+                            <div class="sm:col-span-3">
+                                <label class="text-[10px] font-bold text-slate-600 block mb-1">ID Material / Kode Part</label>
+                                <input type="text" 
+                                       id="newPartCode" 
+                                       oninput="onPartCodeInput(this.value)"
+                                       placeholder="Misal: 300944956 atau T0001 (opsional)" 
+                                       class="w-full px-2.5 py-2 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
+                            </div>
+
+                            <!-- Nama Material / Spare Part (Required) -->
+                            <div class="sm:col-span-5">
+                                <label class="text-[10px] font-bold text-slate-600 block mb-1">Nama Material / Sparepart *</label>
+                                <input type="text" 
+                                       id="newPartName" 
+                                       list="masterMaterialDatalist"
+                                       oninput="onPartNameInput(this.value)"
+                                       onkeydown="if(event.key === 'Enter'){ event.preventDefault(); addRealMaterialItem(); }"
+                                       placeholder="Misal: TURNKNIFE TK IV 330mm HHQ, Roll Dressing..." 
+                                       class="w-full px-2.5 py-2 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
+                                <datalist id="masterMaterialDatalist">
+                                    @foreach(($masterMaterials ?? []) as $mm)
+                                        <option value="{{ $mm->name }}">{{ $mm->item_code ? 'Kode: '.$mm->item_code.' | ' : '' }}{{ $mm->default_unit }}</option>
+                                    @endforeach
+                                </datalist>
+                            </div>
+
+                            <!-- Jumlah / Qty -->
+                            <div class="sm:col-span-2">
+                                <label class="text-[10px] font-bold text-slate-600 block mb-1">Jumlah (Qty) *</label>
+                                <input type="text" 
+                                       id="newPartQty" 
+                                       value="1"
+                                       onkeydown="if(event.key === 'Enter'){ event.preventDefault(); addRealMaterialItem(); }"
+                                       placeholder="Misal: 1, 10, 25" 
+                                       class="w-full px-2.5 py-2 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 text-center focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
+                            </div>
+
+                            <!-- No. Batch -->
+                            <div class="sm:col-span-2">
+                                <label class="text-[10px] font-bold text-slate-600 block mb-1">No. Batch</label>
+                                <input type="text" 
+                                       id="newPartBatch" 
+                                       placeholder="Opsional" 
+                                       class="w-full px-2.5 py-2 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-lg text-xs font-mono text-slate-700 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
+                            </div>
+                        </div>
+
+                        <!-- Action Button -->
+                        <div class="flex justify-end pt-1">
                             <button type="button" 
-                                    onclick="addPresetAsComponent('Knife Run')"
-                                    class="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-[11px] font-bold transition shadow-2xs">
-                                + Knife Run
+                                    onclick="addRealMaterialItem()" 
+                                    class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-xs transition active:scale-95 flex items-center justify-center gap-1.5">
+                                <svg class="w-4 h-4 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                <span>Tambah ke Pallet</span>
                             </button>
                         </div>
                     </div>
+
+                    <!-- Tabel Material Yang Ditambahkan (Desain Tabel Bersih Image 2) -->
+                    <div class="space-y-2 pt-1">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                <span>DAFTAR MATERIAL TERPILIH DI PALLET INI (<span id="selectedCountBadge">0 ITEMS</span>)</span>
+                            </label>
+                            <span class="text-[11px] text-slate-400 font-medium">Bisa menambahkan lebih dari 1 item</span>
+                        </div>
+
+                        <div class="border border-slate-200/90 rounded-xl overflow-hidden bg-white shadow-xs">
+                            <div class="overflow-x-auto max-h-72 overflow-y-auto">
+                                <table class="min-w-full divide-y divide-slate-200 text-left text-xs" id="selectedTable">
+                                    <thead class="bg-slate-50 text-[11px] font-extrabold uppercase tracking-wider text-slate-500 sticky top-0 z-10 shadow-xs">
+                                        <tr>
+                                            <th scope="col" class="py-2.5 px-3 w-10 text-center">NO</th>
+                                            <th scope="col" class="py-2.5 px-3 w-28">ID MATERIAL</th>
+                                            <th scope="col" class="py-2.5 px-3 min-w-[220px]">Nama Material / Sparepart</th>
+                                            <th scope="col" class="py-2.5 px-3 w-28 text-center">Jumlah / Qty</th>
+                                            <th scope="col" class="py-2.5 px-3 w-32">No. Batch</th>
+                                            <th scope="col" class="py-2.5 px-2 w-16 text-center">Hapus</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100 bg-white" id="selectedTableBody">
+                                        <!-- Populated dynamically via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Empty State (Tanpa Data Dummy) -->
+                            <div id="selectedEmptyState" class="py-10 text-center text-slate-400 space-y-1.5 bg-slate-50/50">
+                                <div class="text-sm font-semibold flex items-center justify-center gap-2 text-slate-600">
+                                    <span class="text-2xl">📦</span>
+                                    <span>Belum ada material / spare part yang diinput</span>
+                                </div>
+                                <p class="text-xs text-slate-400 max-w-md mx-auto">
+                                    Silakan masukkan data asli material pada form di atas lalu klik <strong>"Tambah ke Pallet"</strong>.
+                                </p>
+                            </div>
+
+                            <!-- Summary Footer Bar Sesuai Image 2 -->
+                            <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between text-xs font-bold text-slate-700 gap-2">
+                                <div class="flex items-center gap-2">
+                                    <span>Total: <span id="summaryTypesCount" class="text-blue-700 font-extrabold">0</span> Jenis Material</span>
+                                    <span class="text-slate-300">|</span>
+                                    <span>Total Unit: <span id="summaryUnitsCount" class="text-emerald-700 font-extrabold">0</span></span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button type="button" onclick="clearAllSelected()" class="text-[11px] text-rose-600 hover:text-rose-800 hover:underline font-bold transition">
+                                        Kosongkan Semua
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden Inputs for Form Submission -->
+                    <div id="hiddenFormComponents"></div>
+
                 </div>
 
-                <!-- 5. Nomor Batch Pallet & Catatan Umum -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <!-- No. Batch Pallet -->
-                    <div class="space-y-1.5">
-                        <div class="flex items-center justify-between">
-                            <label for="batch_no" class="text-xs font-bold text-slate-700">No. Batch Pallet</label>
-                            <button type="button" 
-                                    onclick="generateTodayBatch()"
-                                    class="text-[10px] font-bold text-blue-600 hover:underline">
-                                Auto-Generate
-                            </button>
-                        </div>
-                        <input type="text" 
-                               name="batch_no" 
-                               id="batch_no" 
-                               value="{{ old('batch_no', 'BATCH-'.date('Ymd').'-'.str_pad($selectedPallet, 3, '0', STR_PAD_LEFT)) }}"
-                               placeholder="Contoh: BATCH-20260904-001"
-                               class="w-full px-3 py-2 bg-slate-50 hover:bg-white border border-slate-200 rounded-xl font-mono text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition shadow-xs">
-                    </div>
-
-                    <!-- Catatan / Lokasi Pallet -->
-                    <div class="space-y-1.5">
-                        <label for="notes" class="text-xs font-bold text-slate-700">Lokasi / Keterangan Pallet</label>
-                        <input type="text" 
-                               name="notes" 
-                               id="notes" 
-                               value="{{ old('notes') }}"
-                               placeholder="Contoh: Rak A-02, Line Produksi 3..."
-                               class="w-full px-3 py-2 bg-slate-50 hover:bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition shadow-xs">
-                    </div>
+                <!-- 5. Lokasi / Keterangan Pallet -->
+                <div class="space-y-1.5">
+                    <label for="notes" class="text-xs font-bold text-slate-700">Lokasi / Keterangan Pallet</label>
+                    <input type="text" 
+                           name="notes" 
+                           id="notes" 
+                           value="{{ old('notes') }}"
+                           placeholder="Contoh: Rak A-02, Line Produksi 3..."
+                           class="w-full px-3 py-2 bg-slate-50 hover:bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition shadow-xs">
                 </div>
 
                 <!-- Submit Action Buttons -->
@@ -413,24 +553,48 @@
         </div>
 
         <!-- ======================================================== -->
-        <!-- LIVE THERMAL LABEL PREVIEW & COMPONENT SUMMARY (5 COLS)  -->
+        <!-- LIVE SUMMARY & KOMPONEN (5 COLUMNS)                      -->
         <!-- ======================================================== -->
         <div class="lg:col-span-5 space-y-4 lg:sticky lg:top-20">
             
             <div class="flex items-center justify-between px-1">
                 <div class="flex items-center gap-2">
                     <span class="w-2.5 h-2.5 rounded-full bg-[#0047BA] animate-pulse"></span>
-                    <h3 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Live Preview Output Sticker</h3>
+                    <h3 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Ringkasan Pallet &amp; Komponen</h3>
                 </div>
                 <span class="text-[11px] font-mono text-slate-500">ANDRITZ Standard</span>
             </div>
 
-            <!-- ANDRITZ Pallet Sticker Card -->
-            <x-andritz-sticker 
-                :pallet-number="$selectedPallet" 
-                :category="$selectedCategory" 
-                :category-code="'I-COS'" 
-                id-prefix="preview" />
+            <!-- Pallet Quick Info Card (Clean card without huge sticker) -->
+            <div class="p-5 bg-gradient-to-br from-blue-900 to-indigo-950 text-white rounded-2xl shadow-md space-y-3.5 border border-blue-800">
+                <div class="flex items-center justify-between border-b border-blue-800/80 pb-3">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-blue-600/40 flex items-center justify-center font-extrabold text-white text-xs border border-blue-400/30">
+                            PLT
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-blue-300 font-bold uppercase tracking-wider block">Target Pallet</span>
+                            <span class="font-mono font-extrabold text-base text-white tracking-tight" id="palletCodeSummary">
+                                PLT-{{ $selectedSite === 'OKI II' ? 'OKI2' : $selectedSite }}-CON-{{ str_pad($selectedPallet, 3, '0', STR_PAD_LEFT) }}
+                            </span>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-blue-500/30 text-blue-200 border border-blue-400/30">
+                        Pallet #<span class="activePalletDisplay">{{ $selectedPallet }}</span>
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5 text-xs">
+                    <div class="bg-blue-950/60 p-2.5 rounded-xl border border-blue-800/60">
+                        <span class="text-[10px] text-blue-300 block mb-0.5">Site / Pabrik:</span>
+                        <span class="font-bold text-white activeSiteDisplay">{{ $selectedSite }}</span>
+                    </div>
+                    <div class="bg-blue-950/60 p-2.5 rounded-xl border border-blue-800/60">
+                        <span class="text-[10px] text-blue-300 block mb-0.5">Kategori:</span>
+                        <span class="font-bold text-white" id="categorySummaryText">{{ $selectedCategory }} Material</span>
+                    </div>
+                </div>
+            </div>
 
             <!-- Live Components Inside Pallet Card -->
             <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs space-y-2.5">
@@ -441,10 +605,10 @@
                         </svg>
                         <span>Daftar Komponen di Pallet Ini</span>
                     </span>
-                    <span class="font-mono font-bold text-slate-500 text-[11px]" id="previewTotalCountText">1 Item</span>
+                    <span class="font-mono font-bold text-slate-500 text-[11px]" id="previewTotalCountText">0 Items</span>
                 </div>
 
-                <div id="previewComponentsList" class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                <div id="previewComponentsList" class="space-y-1.5 max-h-56 overflow-y-auto pr-1">
                     <!-- Populated dynamically via JS -->
                 </div>
             </div>
@@ -470,10 +634,332 @@
 <script>
     const materialPresets = @json($materialPresets);
     const usedPalletsBySite = @json($usedPalletsBySite);
+    const catalogData = @json($catalog);
+    const masterMaterialsData = @json($masterMaterials ?? []);
+
+    /* ------------------------------------------------------------------
+     * Modern Master Material Search & Combobox Functionality
+     * ------------------------------------------------------------------ */
+    let currentMasterDropdownCategory = 'ALL';
+    let currentMasterResults = [...masterMaterialsData];
+    let highlightedMasterIndex = -1;
+
+    function renderMasterDropdownItems() {
+        const list = document.getElementById('masterDropdownList');
+        if (!list) return;
+
+        if (currentMasterResults.length === 0) {
+            list.innerHTML = `
+                <div class="p-4 text-center text-slate-500 text-xs">
+                    <p class="font-bold text-slate-700">Material Tidak Ditemukan</p>
+                    <p class="text-[11px] text-slate-400 mt-1">Coba kata kunci lain atau ketik langsung di form input bawah.</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        currentMasterResults.forEach((mm, idx) => {
+            const isHighlighted = (idx === highlightedMasterIndex);
+            const categoryBadge = (mm.category === 'Dressing')
+                ? '<span class="px-1.5 py-0.5 rounded text-[9.5px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">Dressing</span>'
+                : (mm.category === 'Consumable' ? '<span class="px-1.5 py-0.5 rounded text-[9.5px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Consumable</span>' : '');
+
+            const codeBadge = mm.item_code 
+                ? `<span class="font-mono text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 shrink-0">[${escapeHtml(mm.item_code)}]</span>`
+                : '';
+
+            const unitBadge = mm.default_unit
+                ? `<span class="text-[10px] font-mono text-slate-500">Satuan: <strong>${escapeHtml(mm.default_unit)}</strong></span>`
+                : '';
+
+            const specPreview = mm.specification
+                ? `<span class="text-[10px] text-slate-400 italic truncate ml-1 max-w-[200px] inline-block align-bottom">&bull; ${escapeHtml(mm.specification)}</span>`
+                : '';
+
+            html += `
+                <div class="master-dropdown-item px-3 py-2.5 hover:bg-blue-50/80 cursor-pointer flex items-center justify-between gap-2 transition ${isHighlighted ? 'bg-blue-100/70' : ''}"
+                     data-id="${mm.id}"
+                     onclick="selectMasterItem(${mm.id})">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            ${codeBadge}
+                            <span class="font-bold text-slate-900 text-xs">${escapeHtml(mm.name)}</span>
+                            ${categoryBadge}
+                        </div>
+                        <div class="flex items-center gap-1 mt-0.5 text-slate-500">
+                            ${unitBadge}
+                            ${specPreview}
+                        </div>
+                    </div>
+                    <button type="button" 
+                            class="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10.5px] shadow-2xs shrink-0 transition"
+                            onclick="event.stopPropagation(); selectMasterItem(${mm.id});">
+                        Pilih
+                    </button>
+                </div>
+            `;
+        });
+
+        list.innerHTML = html;
+    }
+
+    function openMasterDropdown() {
+        const menu = document.getElementById('masterDropdownMenu');
+        const icon = document.getElementById('masterChevronIcon');
+        if (menu) menu.classList.remove('hidden');
+        if (icon) icon.classList.add('rotate-180');
+        renderMasterDropdownItems();
+    }
+
+    function closeMasterDropdown() {
+        const menu = document.getElementById('masterDropdownMenu');
+        const icon = document.getElementById('masterChevronIcon');
+        if (menu) menu.classList.add('hidden');
+        if (icon) icon.classList.remove('rotate-180');
+        highlightedMasterIndex = -1;
+    }
+
+    function toggleMasterDropdown() {
+        const menu = document.getElementById('masterDropdownMenu');
+        if (menu && menu.classList.contains('hidden')) {
+            openMasterDropdown();
+            document.getElementById('masterQuickSearchInput')?.focus();
+        } else {
+            closeMasterDropdown();
+        }
+    }
+
+    function filterMasterMaterials(val) {
+        const query = (val || '').trim().toLowerCase();
+        const clearBtn = document.getElementById('masterSearchClearBtn');
+        if (clearBtn) {
+            if (query.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+        }
+
+        currentMasterResults = masterMaterialsData.filter(m => {
+            const matchCat = (currentMasterDropdownCategory === 'ALL' || m.category === currentMasterDropdownCategory);
+            if (!matchCat) return false;
+            if (!query) return true;
+
+            const name = (m.name || '').toLowerCase();
+            const code = (m.item_code || '').toLowerCase();
+            const spec = (m.specification || '').toLowerCase();
+            const cat = (m.category || '').toLowerCase();
+
+            return name.includes(query) || code.includes(query) || spec.includes(query) || cat.includes(query);
+        });
+
+        const countEl = document.getElementById('masterResultsCountText');
+        if (countEl) countEl.textContent = `${currentMasterResults.length} hasil`;
+
+        highlightedMasterIndex = -1;
+        openMasterDropdown();
+    }
+
+    function setMasterDropdownCategory(cat) {
+        currentMasterDropdownCategory = cat;
+        ['ALL', 'Dressing', 'Consumable'].forEach(c => {
+            const chip = document.getElementById(`mChip_${c}`);
+            if (chip) {
+                if (c === cat) {
+                    chip.className = 'px-2 py-0.5 rounded-md font-bold text-[10px] bg-blue-600 text-white shadow-2xs';
+                } else {
+                    chip.className = 'px-2 py-0.5 rounded-md font-semibold text-[10px] bg-white border border-slate-200 text-slate-700 hover:bg-slate-100';
+                }
+            }
+        });
+
+        const searchInp = document.getElementById('masterQuickSearchInput');
+        filterMasterMaterials(searchInp ? searchInp.value : '');
+    }
+
+    function clearMasterQuickSearch() {
+        const searchInp = document.getElementById('masterQuickSearchInput');
+        if (searchInp) {
+            searchInp.value = '';
+            searchInp.focus();
+        }
+        filterMasterMaterials('');
+    }
+
+    function selectMasterItem(id) {
+        if (!id) return;
+        const mm = masterMaterialsData.find(m => String(m.id) === String(id));
+        if (mm) {
+            const codeInp = document.getElementById('newPartCode');
+            const nameInp = document.getElementById('newPartName');
+            const qtyInp = document.getElementById('newPartQty');
+            const notesEl = document.getElementById('newPartNotes');
+
+            if (codeInp) codeInp.value = mm.item_code || '';
+            if (nameInp) nameInp.value = mm.name || '';
+            if (qtyInp) {
+                qtyInp.value = '1';
+                qtyInp.focus();
+                qtyInp.select();
+            }
+            if (notesEl && mm.specification) {
+                notesEl.value = mm.specification;
+            }
+
+            // Sync hidden select
+            const sel = document.getElementById('masterMaterialSelect');
+            if (sel) sel.value = mm.id;
+
+            // Show selected preview bar
+            const prevBar = document.getElementById('selectedMaterialPreviewBar');
+            const nameTxt = document.getElementById('selectedMatNameText');
+            const codeTxt = document.getElementById('selectedMatCodeText');
+
+            if (prevBar && nameTxt && codeTxt) {
+                nameTxt.textContent = mm.name;
+                codeTxt.textContent = mm.item_code ? `[${mm.item_code}]` : '';
+                prevBar.classList.remove('hidden');
+            }
+
+            // Update search input to reflect selection
+            const searchInp = document.getElementById('masterQuickSearchInput');
+            if (searchInp) {
+                searchInp.value = `${mm.item_code ? '[' + mm.item_code + '] ' : ''}${mm.name}`;
+                document.getElementById('masterSearchClearBtn')?.classList.remove('hidden');
+            }
+
+            closeMasterDropdown();
+        }
+    }
+
+    function resetSelectedMaterialBar() {
+        const prevBar = document.getElementById('selectedMaterialPreviewBar');
+        if (prevBar) prevBar.classList.add('hidden');
+
+        const searchInp = document.getElementById('masterQuickSearchInput');
+        if (searchInp) searchInp.value = '';
+        document.getElementById('masterSearchClearBtn')?.classList.add('hidden');
+
+        const codeInp = document.getElementById('newPartCode');
+        const nameInp = document.getElementById('newPartName');
+        const notesEl = document.getElementById('newPartNotes');
+        if (codeInp) codeInp.value = '';
+        if (nameInp) nameInp.value = '';
+        if (notesEl) notesEl.value = '';
+
+        const sel = document.getElementById('masterMaterialSelect');
+        if (sel) sel.value = '';
+
+        filterMasterMaterials('');
+    }
+
+    function handleMasterSearchKeydown(e) {
+        const menu = document.getElementById('masterDropdownMenu');
+        if (menu && menu.classList.contains('hidden')) {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                openMasterDropdown();
+                e.preventDefault();
+                return;
+            }
+        }
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (highlightedMasterIndex < currentMasterResults.length - 1) {
+                highlightedMasterIndex++;
+                renderMasterDropdownItems();
+                scrollHighlightedItemIntoView();
+            }
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (highlightedMasterIndex > 0) {
+                highlightedMasterIndex--;
+                renderMasterDropdownItems();
+                scrollHighlightedItemIntoView();
+            }
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (highlightedMasterIndex >= 0 && highlightedMasterIndex < currentMasterResults.length) {
+                selectMasterItem(currentMasterResults[highlightedMasterIndex].id);
+            } else if (currentMasterResults.length === 1) {
+                selectMasterItem(currentMasterResults[0].id);
+            }
+        } else if (e.key === 'Escape') {
+            closeMasterDropdown();
+        }
+    }
+
+    function scrollHighlightedItemIntoView() {
+        const list = document.getElementById('masterDropdownList');
+        if (!list) return;
+        const items = list.querySelectorAll('.master-dropdown-item');
+        if (items[highlightedMasterIndex]) {
+            items[highlightedMasterIndex].scrollIntoView({ block: 'nearest' });
+        }
+    }
+
+    function onPartCodeInput(val) {
+        if (!val || val.trim() === '') return;
+        const cleanVal = val.trim().toLowerCase();
+        const found = masterMaterialsData.find(m => (m.item_code || '').toLowerCase() === cleanVal);
+        if (found) {
+            selectMasterItem(found.id);
+        }
+    }
+
+    function onSelectMasterMaterial(id) {
+        selectMasterItem(id);
+    }
+
+    function onPartNameInput(val) {
+        if (!val || val.trim() === '') return;
+        const found = masterMaterialsData.find(m => m.name.toLowerCase() === val.trim().toLowerCase());
+        if (found) {
+            selectMasterItem(found.id);
+        }
+    }
+
+    // Close dropdown on click outside
+    document.addEventListener('click', function(e) {
+        const wrapper = document.getElementById('masterSearchWrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            closeMasterDropdown();
+        }
+    });
+
     let currentSite = "{{ old('site', $selectedSite) }}";
     let currentCategory = "{{ old('category', $selectedCategory) }}";
     let currentPallet = parseInt("{{ old('pallet_number', $selectedPallet) }}", 10);
-    let componentCounter = 1;
+    
+    // Multi-Item Real State
+    let selectedItems = [];
+
+    // Check for old form inputs on validation error
+    @php
+        $oldComponentsData = old('components', []);
+    @endphp
+    const initialOldComponents = @json($oldComponentsData);
+    if (Array.isArray(initialOldComponents) && initialOldComponents.length > 0) {
+        initialOldComponents.forEach((comp, idx) => {
+            if (comp.component_name && comp.component_name.trim() !== '') {
+                let code = '';
+                let name = comp.component_name.trim();
+                const dashIdx = name.indexOf(' - ');
+                if (dashIdx > 0 && dashIdx <= 25) {
+                    code = name.substring(0, dashIdx).trim();
+                    name = name.substring(dashIdx + 3).trim();
+                }
+                selectedItems.push({
+                    code: code,
+                    name: name,
+                    qty: comp.quantity || '1',
+                    batch: comp.batch_no || '',
+                    notes: comp.notes || ''
+                });
+            }
+        });
+    }
 
     const siteCodeMap = {
         'OKI II': 'OKI2',
@@ -482,6 +968,16 @@
         'TELL': 'TELL',
         'ISC': 'ISC'
     };
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
 
     function calculateCode(site, category, num) {
         const sCode = siteCodeMap[site] || site.replace(/[^A-Za-z0-9]/g, '');
@@ -549,11 +1045,20 @@
         const codePreview = document.getElementById('palletCodePreviewText');
         if (codePreview) codePreview.textContent = code;
 
+        const codeSummary = document.getElementById('palletCodeSummary');
+        if (codeSummary) codeSummary.textContent = code;
+
+        const catSummary = document.getElementById('categorySummaryText');
+        if (catSummary) catSummary.textContent = (currentCategory === 'Dressing') ? 'Dressing Material' : 'Consumable Material';
+
         refreshLivePreview();
     }
 
     function onSiteChange(site) {
         currentSite = site;
+        const siteDisplay = document.getElementById('catalogActiveSiteDisplay');
+        if (siteDisplay) siteDisplay.textContent = site;
+
         // Update site radio visual
         document.querySelectorAll('.site-radio').forEach(radio => {
             const tile = radio.closest('label').querySelector('.site-tile');
@@ -564,7 +1069,6 @@
             }
         });
 
-        // Automatically pick next available pallet number for new site if current is used
         const usedList = usedPalletsBySite[site] || [];
         if (usedList.includes(currentPallet)) {
             autoSelectNextPallet();
@@ -588,29 +1092,6 @@
                 tile.className = 'cat-tile p-3.5 rounded-xl border transition-all flex items-center gap-3 bg-slate-50/50 hover:bg-slate-100 border-slate-200 text-slate-700';
             }
         });
-
-        // Update presets chips
-        const container = document.getElementById('presetChipsContainer');
-        container.innerHTML = '';
-        const presets = materialPresets[cat] || [];
-        presets.forEach(p => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'px-2.5 py-1 rounded-lg bg-white hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 border border-slate-200 text-slate-700 text-[11px] font-medium transition shadow-2xs';
-            btn.textContent = `+ ${p}`;
-            btn.onclick = () => addPresetAsComponent(p);
-            container.appendChild(btn);
-        });
-
-        // Add popular Knife Run button for Dressing
-        if (cat === 'Dressing') {
-            const krBtn = document.createElement('button');
-            krBtn.type = 'button';
-            krBtn.className = 'px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-[11px] font-bold transition shadow-2xs';
-            krBtn.textContent = '+ Knife Run';
-            krBtn.onclick = () => addPresetAsComponent('Knife Run');
-            container.appendChild(krBtn);
-        }
 
         updateThermalPreview();
     }
@@ -650,139 +1131,195 @@
     function generateTodayBatch() {
         const dateStr = new Date().toISOString().slice(0,10).replace(/-/g, '');
         const pad = String(currentPallet).padStart(3, '0');
-        const batch = `BATCH-${dateStr}-${pad}`;
-        document.getElementById('batch_no').value = batch;
+        const batchEl = document.getElementById('batch_no');
+        if (batchEl) batchEl.value = batch;
     }
 
-    /* ----------------------------------------------------
-     * Dynamic Component Management Functions
-     * ---------------------------------------------------- */
-    function addComponentRow(name = '', qty = '1 UNIT', batch = '', notes = '') {
-        const container = document.getElementById('componentsContainer');
-        const idx = container.querySelectorAll('.component-row').length;
+    /* ------------------------------------------------------------------
+     * Real Material Items Management Functions (Clean, No Dummy Data)
+     * ------------------------------------------------------------------ */
 
-        const row = document.createElement('div');
-        row.className = 'component-row p-3.5 bg-white border border-slate-200 rounded-xl shadow-xs space-y-2.5 transition relative';
-        row.innerHTML = `
-            <div class="flex items-center justify-between text-xs font-bold text-slate-700">
-                <span class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                    <span class="row-label">Komponen #${idx + 1}</span>
-                </span>
-                <button type="button" 
-                        onclick="removeComponentRow(this)" 
-                        class="text-rose-500 hover:text-rose-700 text-xs font-semibold remove-btn">
-                    &times; Hapus
-                </button>
-            </div>
+    function addRealMaterialItem() {
+        const codeInp = document.getElementById('newPartCode');
+        const nameInp = document.getElementById('newPartName');
+        const qtyInp = document.getElementById('newPartQty');
+        const batchInp = document.getElementById('newPartBatch');
+        const notesInp = document.getElementById('newPartNotes');
 
-            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-                <div class="sm:col-span-7">
-                    <label class="text-[10px] font-bold text-slate-500 block mb-1">Nama Komponen / Material *</label>
-                    <input type="text" 
-                           name="components[${idx}][component_name]" 
-                           value="${name}" 
-                           required
-                           oninput="refreshLivePreview()"
-                           placeholder="Contoh: Knife Run, Roll Dressing, Diamond Stone..." 
-                           class="w-full px-3 py-2 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition component-name-input">
-                </div>
-
-                <div class="sm:col-span-5">
-                    <label class="text-[10px] font-bold text-slate-500 block mb-1">Jumlah / Qty</label>
-                    <input type="text" 
-                           name="components[${idx}][quantity]" 
-                           value="${qty}" 
-                           oninput="refreshLivePreview()"
-                           placeholder="Contoh: 10 PCS, 2 UNIT" 
-                           class="w-full px-3 py-2 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition component-qty-input">
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-                <div class="sm:col-span-6">
-                    <input type="text" 
-                           name="components[${idx}][batch_no]" 
-                           value="${batch}" 
-                           placeholder="No. Batch komponen (opsional)" 
-                           class="w-full px-3 py-1.5 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-lg text-xs font-mono text-slate-700 focus:outline-none focus:border-blue-600 transition">
-                </div>
-                <div class="sm:col-span-6">
-                    <input type="text" 
-                           name="components[${idx}][notes]" 
-                           value="${notes}" 
-                           placeholder="Catatan / Spesifikasi (opsional)" 
-                           class="w-full px-3 py-1.5 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-blue-600 transition">
-                </div>
-            </div>
-        `;
-
-        container.appendChild(row);
-        updateRowNumbers();
-        refreshLivePreview();
-
-        // Focus the new component input
-        const newInp = row.querySelector('.component-name-input');
-        if (newInp) newInp.focus();
-    }
-
-    function removeComponentRow(btn) {
-        const container = document.getElementById('componentsContainer');
-        const rows = container.querySelectorAll('.component-row');
-        if (rows.length <= 1) return;
-
-        btn.closest('.component-row').remove();
-        updateRowNumbers();
-        refreshLivePreview();
-    }
-
-    function updateRowNumbers() {
-        const container = document.getElementById('componentsContainer');
-        const rows = container.querySelectorAll('.component-row');
-
-        rows.forEach((row, idx) => {
-            row.querySelector('.row-label').textContent = `Komponen #${idx + 1}`;
-            const removeBtn = row.querySelector('.remove-btn');
-            if (rows.length > 1) {
-                removeBtn.classList.remove('hidden');
-            } else {
-                removeBtn.classList.add('hidden');
-            }
-
-            // Update input name attributes
-            row.querySelectorAll('input').forEach(input => {
-                const name = input.getAttribute('name');
-                if (name) {
-                    input.setAttribute('name', name.replace(/components\[\d+\]/, `components[${idx}]`));
-                }
-            });
-        });
-
-        const badge = document.getElementById('componentCounterBadge');
-        if (badge) badge.textContent = `${rows.length} Komponen`;
-    }
-
-    function addPresetAsComponent(name) {
-        const container = document.getElementById('componentsContainer');
-        const rows = container.querySelectorAll('.component-row');
-        
-        // If first row input is empty, fill it
-        if (rows.length === 1) {
-            const firstInput = rows[0].querySelector('.component-name-input');
-            if (!firstInput.value || firstInput.value.trim() === '') {
-                firstInput.value = name;
-                refreshLivePreview();
-                return;
-            }
+        const name = nameInp ? nameInp.value.trim() : '';
+        if (!name) {
+            alert('Silakan masukkan nama material / spare part terlebih dahulu.');
+            nameInp?.focus();
+            return;
         }
 
-        // Otherwise add new row
-        addComponentRow(name);
+        const code = codeInp ? codeInp.value.trim() : '';
+        const qty = (qtyInp && qtyInp.value.trim()) ? qtyInp.value.trim() : '1';
+        const batch = batchInp ? batchInp.value.trim() : '';
+        const notes = notesInp ? notesInp.value.trim() : '';
+
+        selectedItems.push({
+            code: code,
+            name: name,
+            qty: qty,
+            batch: batch,
+            notes: notes
+        });
+
+        // Reset input fields
+        if (codeInp) codeInp.value = '';
+        if (nameInp) nameInp.value = '';
+        if (qtyInp) qtyInp.value = '1';
+        if (batchInp) batchInp.value = '';
+        if (notesInp) notesInp.value = '';
+
+        // Focus code or name input for next fast entry
+        if (codeInp) {
+            codeInp.focus();
+        } else if (nameInp) {
+            nameInp.focus();
+        }
+
+        renderSelectedTable();
+    }
+
+    function removeSelectedItem(idx) {
+        if (idx >= 0 && idx < selectedItems.length) {
+            selectedItems.splice(idx, 1);
+            renderSelectedTable();
+        }
+    }
+
+    function updateSelectedQty(idx, val) {
+        if (selectedItems[idx]) {
+            selectedItems[idx].qty = val;
+            updateSummaryCounters();
+            updateHiddenFormInputs();
+            refreshLivePreview();
+        }
+    }
+
+    function updateSelectedBatch(idx, val) {
+        if (selectedItems[idx]) {
+            selectedItems[idx].batch = val;
+            updateHiddenFormInputs();
+        }
+    }
+
+    function updateSelectedNotes(idx, val) {
+        if (selectedItems[idx]) {
+            selectedItems[idx].notes = val;
+            updateHiddenFormInputs();
+        }
+    }
+
+    function clearAllSelected() {
+        if (selectedItems.length === 0) return;
+        if (confirm('Kosongkan semua material yang telah diinput di pallet ini?')) {
+            selectedItems = [];
+            renderSelectedTable();
+        }
+    }
+
+    function renderSelectedTable() {
+        const tbody = document.getElementById('selectedTableBody');
+        const emptyState = document.getElementById('selectedEmptyState');
+        const badge = document.getElementById('selectedCountBadge');
+        const topBadge = document.getElementById('componentCountBadge');
+
+        if (!tbody || !emptyState) return;
+
+        const countText = `${selectedItems.length} ITEMS`;
+        if (badge) badge.textContent = countText;
+        if (topBadge) topBadge.textContent = `${selectedItems.length} Item Ditambahkan`;
+
+        if (selectedItems.length === 0) {
+            tbody.innerHTML = '';
+            emptyState.classList.remove('hidden');
+        } else {
+            emptyState.classList.add('hidden');
+            let html = '';
+            selectedItems.forEach((item, idx) => {
+                html += `
+                    <tr class="hover:bg-blue-50/30 transition">
+                        <td class="py-2.5 px-3 text-center font-bold text-slate-400 text-xs">${idx + 1}</td>
+                        <td class="py-2.5 px-3 whitespace-nowrap">
+                            ${item.code 
+                                ? `<span class="font-mono text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">${escapeHtml(item.code)}</span>` 
+                                : '<span class="text-slate-300 text-xs italic">-</span>'}
+                        </td>
+                        <td class="py-2.5 px-3">
+                            <div class="font-bold text-slate-900 text-xs">${escapeHtml(item.name)}</div>
+                        </td>
+                        <td class="py-2.5 px-3 text-center whitespace-nowrap">
+                            <input type="text" 
+                                   value="${escapeHtml(item.qty)}" 
+                                   oninput="updateSelectedQty(${idx}, this.value)" 
+                                   class="w-24 px-2 py-1 bg-white border border-slate-300 rounded-lg text-center text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-100 shadow-2xs">
+                        </td>
+                        <td class="py-2.5 px-3 whitespace-nowrap">
+                            <input type="text" 
+                                   value="${escapeHtml(item.batch || '')}" 
+                                   placeholder="Default batch" 
+                                   oninput="updateSelectedBatch(${idx}, this.value)" 
+                                   class="w-28 px-2 py-1 bg-white border border-slate-200 rounded-lg text-xs font-mono text-slate-700 focus:outline-none focus:border-blue-600">
+                        </td>
+                        <td class="py-2.5 px-2 text-center whitespace-nowrap">
+                            <button type="button" 
+                                    onclick="removeSelectedItem(${idx})" 
+                                    class="w-7 h-7 rounded-lg hover:bg-rose-50 text-rose-500 hover:text-rose-700 flex items-center justify-center font-bold text-base transition mx-auto" 
+                                    title="Hapus material ini">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        updateSummaryCounters();
+        updateHiddenFormInputs();
+        refreshLivePreview();
+    }
+
+    function updateSummaryCounters() {
+        const typesEl = document.getElementById('summaryTypesCount');
+        const unitsEl = document.getElementById('summaryUnitsCount');
+        if (typesEl) typesEl.textContent = selectedItems.length;
+        if (unitsEl) {
+            const totalUnits = selectedItems.reduce((acc, item) => {
+                const parsed = parseInt(item.qty, 10);
+                return acc + (isNaN(parsed) ? 1 : parsed);
+            }, 0);
+            unitsEl.textContent = totalUnits;
+        }
+    }
+
+    function updateHiddenFormInputs() {
+        const container = document.getElementById('hiddenFormComponents');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const defaultBatch = document.getElementById('batch_no')?.value || '';
+
+        selectedItems.forEach((item, idx) => {
+            const fullName = item.code ? `${item.code} - ${item.name}` : item.name;
+            const fullQty = item.qty || '1';
+            const batchVal = item.batch || defaultBatch;
+
+            container.innerHTML += `
+                <input type="hidden" name="components[${idx}][component_name]" value="${escapeHtml(fullName)}">
+                <input type="hidden" name="components[${idx}][quantity]" value="${escapeHtml(fullQty)}">
+                <input type="hidden" name="components[${idx}][batch_no]" value="${escapeHtml(batchVal)}">
+                <input type="hidden" name="components[${idx}][notes]" value="${escapeHtml(item.notes || '')}">
+            `;
+        });
     }
 
     function refreshLivePreview() {
-        const container = document.getElementById('componentsContainer');
-        const rows = container.querySelectorAll('.component-row');
         const previewList = document.getElementById('previewComponentsList');
         const countText = document.getElementById('previewTotalCountText');
 
@@ -790,21 +1327,19 @@
         previewList.innerHTML = '';
 
         let validCount = 0;
-        rows.forEach((row, idx) => {
-            const name = row.querySelector('.component-name-input')?.value || '';
-            const qty = row.querySelector('.component-qty-input')?.value || '1 UNIT';
-
-            if (name.trim() !== '') {
+        selectedItems.forEach((item, idx) => {
+            if (item.name && item.name.trim() !== '') {
                 validCount++;
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs';
                 itemDiv.innerHTML = `
                     <div class="flex items-center gap-1.5 font-bold text-slate-800 truncate pr-2">
                         <span class="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span>
-                        <span class="truncate">${name}</span>
+                        ${item.code ? `<span class="font-mono text-[10px] text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 font-bold shrink-0">${escapeHtml(item.code)}</span>` : ''}
+                        <span class="truncate">${escapeHtml(item.name)}</span>
                     </div>
                     <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800 shrink-0">
-                        ${qty}
+                        ${escapeHtml(item.qty || '1')}
                     </span>
                 `;
                 previewList.appendChild(itemDiv);
@@ -812,17 +1347,28 @@
         });
 
         if (validCount === 0) {
-            previewList.innerHTML = '<p class="text-slate-400 text-xs italic py-1">Belum ada komponen diisi.</p>';
+            previewList.innerHTML = '<p class="text-slate-400 text-xs italic py-1">Belum ada material diinput.</p>';
         }
 
-        if (countText) countText.textContent = `${validCount} Komponen`;
+        if (countText) countText.textContent = `${validCount} Items`;
     }
 
-    // Initialize state on page load
+    // Intercept form submit to alert if no item has been added
     document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('createPalletForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (selectedItems.length === 0) {
+                    e.preventDefault();
+                    alert('Silakan masukkan minimal 1 material / spare part asli pada form di atas.');
+                    document.getElementById('newPartName')?.focus();
+                    return false;
+                }
+            });
+        }
+
         checkPalletAvailability();
-        updateRowNumbers();
-        refreshLivePreview();
+        renderSelectedTable();
     });
 </script>
 @endpush

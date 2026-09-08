@@ -19,11 +19,21 @@ class DatabaseSeeder extends Seeder
     {
         // Default users for authentication
         User::updateOrCreate(
+            ['user_id' => 'admin_andritz'],
+            [
+                'name' => 'Admin ANDRITZ',
+                'email' => 'admin@andritz.com',
+                'password' => Hash::make('admin123'),
+                'role' => 'admin',
+            ]
+        );
+
+        User::updateOrCreate(
             ['user_id' => 'admin'],
             [
                 'name' => 'System Administrator',
                 'email' => 'admin@pallet-system.local',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('admin123'),
                 'role' => 'admin',
             ]
         );

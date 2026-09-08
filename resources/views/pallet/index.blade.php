@@ -122,15 +122,6 @@
 
             <!-- Tombol Buat Sticker Baru (Primary Hero CTA) -->
             <div class="flex items-center gap-2">
-                <button type="button" 
-                        onclick="openCreateModal()"
-                        class="hidden sm:inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all"
-                        title="Buka Popup Cepat">
-                    <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
-                    </svg>
-                    <span>Popup Cepat</span>
-                </button>
                 <a href="{{ route('pallet.create') }}" 
                    class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm hover:shadow-md shadow-blue-500/20 active:scale-95 transition-all">
                     <svg class="w-4 h-4 text-white stroke-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,100 +135,60 @@
         <!-- Filter Buttons & Search Controls -->
         <div class="flex flex-wrap items-center gap-2" id="filterContainer">
             
-            <!-- 1. Semua Site (Default) -->
-            <button type="button" 
-                    onclick="applyFilter('ALL', 'site')" 
-                    id="btn_filter_ALL"
-                    class="filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-150 flex items-center gap-2 bg-blue-600 text-white shadow-xs shadow-blue-500/30">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-                </svg>
-                <span>Semua Site</span>
-                <span class="px-2 py-0.5 rounded-full bg-white/25 text-[11px] font-mono font-bold" id="count_ALL">{{ count($stickers) }}</span>
-            </button>
+            <!-- 1. Single Unified Site Filter Dropdown -->
+            <div class="relative inline-flex items-center">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-blue-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                </div>
+                <select id="siteFilterSelect" 
+                        onchange="onSiteFilterChange(this.value)"
+                        class="pl-9 pr-8 py-2 bg-slate-50 hover:bg-white border border-slate-200 hover:border-slate-300 rounded-xl text-xs font-bold text-slate-800 shadow-xs focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all cursor-pointer appearance-none">
+                    <option value="ALL" id="opt_ALL">Semua Site</option>
+                    <option value="OKI II" id="opt_OKI_II">OKI II</option>
+                    <option value="IKPD" id="opt_IKPD">IKPD</option>
+                    <option value="IKPP" id="opt_IKPP">IKPP</option>
+                    <option value="TELL" id="opt_TELL">TELL</option>
+                    <option value="ISC" id="opt_ISC">ISC</option>
+                </select>
+                <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-slate-400">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </div>
+            </div>
 
             <span class="w-px h-6 bg-slate-200 mx-1 hidden sm:inline-block"></span>
 
-            <!-- 2. OKI II -->
-            <button type="button" 
-                    onclick="applyFilter('OKI II', 'site')" 
-                    id="btn_filter_OKI II"
-                    class="filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition-all flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-blue-600"></span>
-                <span>OKI II</span>
-                <span class="text-[10px] text-slate-500 font-mono font-bold" id="count_OKI_II"></span>
-            </button>
-
-            <!-- 3. IKPD -->
-            <button type="button" 
-                    onclick="applyFilter('IKPD', 'site')" 
-                    id="btn_filter_IKPD"
-                    class="filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition-all flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-                <span>IKPD</span>
-                <span class="text-[10px] text-slate-500 font-mono font-bold" id="count_IKPD"></span>
-            </button>
-
-            <!-- 4. IKPP -->
-            <button type="button" 
-                    onclick="applyFilter('IKPP', 'site')" 
-                    id="btn_filter_IKPP"
-                    class="filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition-all flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-purple-600"></span>
-                <span>IKPP</span>
-                <span class="text-[10px] text-slate-500 font-mono font-bold" id="count_IKPP"></span>
-            </button>
-
-            <!-- 5. TELL -->
-            <button type="button" 
-                    onclick="applyFilter('TELL', 'site')" 
-                    id="btn_filter_TELL"
-                    class="filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition-all flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-amber-600"></span>
-                <span>TELL</span>
-                <span class="text-[10px] text-slate-500 font-mono font-bold" id="count_TELL"></span>
-            </button>
-
-            <!-- 6. ISC -->
-            <button type="button" 
-                    onclick="applyFilter('ISC', 'site')" 
-                    id="btn_filter_ISC"
-                    class="filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition-all flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-cyan-600"></span>
-                <span>ISC</span>
-                <span class="text-[10px] text-slate-500 font-mono font-bold" id="count_ISC"></span>
-            </button>
-
-            <span class="w-px h-6 bg-slate-200 mx-1 hidden sm:inline-block"></span>
-
-            <!-- 7. Dressing -->
-            <button type="button" 
-                    onclick="applyFilter('Dressing', 'category')" 
-                    id="btn_filter_Dressing"
-                    class="filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 hover:bg-indigo-50 text-slate-700 border border-slate-200 hover:border-indigo-300 transition-all flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-                </svg>
-                <span>Dressing</span>
-                <span class="text-[10px] text-indigo-600 font-mono font-bold bg-indigo-50 px-1.5 py-0.2 rounded">({{ $totalDressing }})</span>
-            </button>
-
-            <!-- 8. Consumable -->
-            <button type="button" 
-                    onclick="applyFilter('Consumable', 'category')" 
-                    id="btn_filter_Consumable"
-                    class="filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 hover:bg-amber-50 text-slate-700 border border-slate-200 hover:border-amber-300 transition-all flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
-                </svg>
-                <span>Consumable</span>
-                <span class="text-[10px] text-amber-600 font-mono font-bold bg-amber-50 px-1.5 py-0.2 rounded">({{ $totalConsumable }})</span>
-            </button>
+            <!-- 2. Kategori Filter (Semua Kategori, Dressing, Consumable) -->
+            <div class="inline-flex items-center rounded-xl bg-slate-100 p-1 border border-slate-200/80">
+                <button type="button" 
+                        onclick="onCategoryFilterChange('ALL')" 
+                        id="btn_cat_ALL"
+                        class="cat-filter-btn px-3 py-1 rounded-lg text-xs font-bold transition-all bg-white text-blue-700 shadow-xs">
+                    Semua Kategori
+                </button>
+                <button type="button" 
+                        onclick="onCategoryFilterChange('Dressing')" 
+                        id="btn_cat_Dressing"
+                        class="cat-filter-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 hover:text-indigo-600 transition-all flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
+                    <span>Dressing</span>
+                </button>
+                <button type="button" 
+                        onclick="onCategoryFilterChange('Consumable')" 
+                        id="btn_cat_Consumable"
+                        class="cat-filter-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 hover:text-amber-600 transition-all flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
+                    <span>Consumable</span>
+                </button>
+            </div>
 
             <!-- Live Search Bar -->
-            <div class="ml-auto w-full sm:w-64 relative mt-2 sm:mt-0">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="ml-auto w-full sm:w-80 md:w-96 lg:w-[420px] relative mt-2 sm:mt-0">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
@@ -245,26 +196,10 @@
                 <input type="text" 
                        id="liveSearchInput" 
                        oninput="onSearchChange(this.value)"
-                       placeholder="Cari nomor, material, batch..." 
-                       class="w-full pl-9 pr-8 py-1.5 bg-slate-50 hover:bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all">
-                <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-slate-300 font-mono text-[10px]">
-                    /
-                </div>
+                       placeholder="Cari nomor, material, batch, catatan..." 
+                       class="w-full pl-10 pr-4 py-2 bg-slate-50 hover:bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all shadow-xs">
             </div>
 
-        </div>
-
-        <!-- Filter Status Bar -->
-        <div class="flex items-center justify-between text-xs pt-1 text-slate-500 border-t border-slate-100">
-            <div class="flex items-center gap-2">
-                <span class="font-medium text-slate-600">Status filter:</span>
-                <span id="activeFilterBadge" class="font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-lg text-[11px]">
-                    Semua Site (Seluruh Data)
-                </span>
-            </div>
-            <div class="text-[11px] text-slate-500 font-mono">
-                Menampilkan <span id="visibleRowCount" class="font-bold text-slate-900">{{ count($stickers) }}</span> dari {{ count($stickers) }} baris data
-            </div>
         </div>
 
     </div>
@@ -314,13 +249,12 @@
                         <th class="py-3 px-4">Site</th>
                         <th class="py-3 px-4">Kategori</th>
                         <th class="py-3 px-4">No. Pallet</th>
-                        <th class="py-3 px-4">Kode Pallet</th>
                         <th class="py-3 px-4">Nama Material</th>
-                        <th class="py-3 px-4">No. Batch</th>
+                        <th class="py-3 px-4">Catatan</th>
                         <th class="py-3 px-4">Jumlah</th>
                         <th class="py-3 px-4">Operator</th>
                         <th class="py-3 px-4">Waktu Cetak</th>
-                        <th class="py-3 px-4 text-right">Aksi Sticker</th>
+                        <th class="py-3 px-4 text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 bg-white" id="palletTableBody">
@@ -342,6 +276,7 @@
                                 'ISC' => 'bg-cyan-600',
                                 default => 'bg-slate-600',
                             };
+                            $noteText = $item->notes ?: $item->components->pluck('notes')->filter()->first();
                         @endphp
                         <tr class="pallet-row hover:bg-slate-50/80 transition-colors duration-150 group"
                             data-site="{{ $item->site }}"
@@ -349,7 +284,8 @@
                             data-pallet="{{ $item->pallet_number }}"
                             data-material="{{ strtolower($item->material_name) }}"
                             data-code="{{ strtolower($item->pallet_code) }}"
-                            data-batch="{{ strtolower($item->batch_no) }}">
+                            data-batch="{{ strtolower($item->batch_no) }}"
+                            data-notes="{{ strtolower($noteText ?? '') }}">
                             
                             <!-- Index -->
                             <td class="py-3.5 px-4 text-center font-mono text-slate-400 row-index">
@@ -377,24 +313,25 @@
                                 <span class="text-[10px] text-slate-400 font-medium">/500</span>
                             </td>
 
-                            <!-- Kode Pallet -->
-                            <td class="py-3.5 px-4 font-mono text-blue-600 font-bold whitespace-nowrap">
-                                {{ $item->pallet_code }}
-                            </td>
-
                             <!-- Nama Material -->
                             <td class="py-3.5 px-4 font-bold text-slate-900">
                                 {{ $item->material_name }}
                             </td>
 
-                            <!-- No Batch -->
-                            <td class="py-3.5 px-4 font-mono text-[11px] text-slate-600 whitespace-nowrap">
-                                {{ $item->batch_no }}
+                            <!-- Catatan -->
+                            <td class="py-3.5 px-4">
+                                @if(!empty($noteText))
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 max-w-[200px] truncate" title="{{ $noteText }}">
+                                        {{ $noteText }}
+                                    </span>
+                                @else
+                                    <span class="text-slate-300 italic text-xs">&mdash;</span>
+                                @endif
                             </td>
 
                             <!-- Qty -->
                             <td class="py-3.5 px-4 font-medium text-slate-700 whitespace-nowrap">
-                                {{ $item->quantity ?: '1 PALLET' }}
+                                {{ preg_replace('/\s*items?/i', '', $item->quantity ?: '1') }}
                             </td>
 
                             <!-- Operator -->
@@ -457,7 +394,7 @@
                         </tr>
                     @empty
                         <tr id="emptyRow">
-                            <td colspan="11" class="py-14 text-center">
+                            <td colspan="10" class="py-14 text-center">
                                 <div class="max-w-xs mx-auto space-y-3">
                                     <div class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
                                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -466,9 +403,9 @@
                                     </div>
                                     <div class="text-sm font-bold text-slate-800">Belum Ada Pallet Terdaftar</div>
                                     <p class="text-xs text-slate-500">Mulai buat label sticker pallet baru dari rentang nomor 1 hingga 500.</p>
-                                    <button type="button" onclick="openCreateModal()" class="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition">
+                                    <a href="{{ route('pallet.create') }}" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition">
                                         Buat Sticker Sekarang
-                                    </button>
+                                    </a>
                                 </div>
                             </td>
                         </tr>
@@ -476,7 +413,7 @@
                     
                     <!-- Dynamic No Results Message when filtered out -->
                     <tr id="noResultsFilteredRow" class="hidden">
-                        <td colspan="11" class="py-14 text-center">
+                        <td colspan="10" class="py-14 text-center">
                             <div class="max-w-xs mx-auto space-y-3">
                                 <div class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -486,8 +423,8 @@
                                 </div>
                                 <div class="text-sm font-bold text-slate-800">Tidak Ada Data Yang Sesuai</div>
                                 <div class="text-xs text-slate-500">Coba ubah kata kunci pencarian atau pilih filter site yang lain.</div>
-                                <button type="button" onclick="applyFilter('ALL', 'site')" class="mt-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 rounded-xl text-xs font-bold transition">
-                                    Tampilkan Semua Site
+                                <button type="button" onclick="resetAllFilters()" class="mt-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 rounded-xl text-xs font-bold transition">
+                                    Reset Filter & Tampilkan Semua
                                 </button>
                             </div>
                         </td>
@@ -498,228 +435,6 @@
 
     </div>
 
-</div>
-
-<!-- ======================================================== -->
-<!-- 4. MODAL BUAT & CETAK STICKER PALLET BARU (MODERN MODAL)  -->
-<!-- ======================================================== -->
-<div id="createModal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md hidden items-center justify-center p-4 overflow-y-auto">
-    <div class="bg-white border border-slate-200/90 rounded-3xl max-w-3xl w-full shadow-2xl relative my-8 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-        
-        <!-- Modal Header -->
-        <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between border-b border-slate-800">
-            <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="text-sm font-extrabold text-white">Buat Sticker Pallet Baru</h3>
-                    <p class="text-[11px] text-slate-400">Rentang validasi nomor: 1 s/d 500 label terdaftar</p>
-                </div>
-            </div>
-            <button type="button" onclick="closeCreateModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
-
-        <form method="POST" action="{{ route('pallet.store') }}" id="modalPalletForm" class="p-6">
-            @csrf
-            
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-                
-                <!-- Left Input Fields (7 cols) -->
-                <div class="md:col-span-7 space-y-4">
-                    
-                    <!-- 1. Site Selection -->
-                    <div>
-                        <label class="block text-xs font-bold text-slate-800 mb-1.5 flex items-center justify-between">
-                            <span>1. Pilih Site / Pabrik</span>
-                            <span class="text-[10px] text-slate-400 font-normal">Wajib dipilih</span>
-                        </label>
-                        <div class="grid grid-cols-5 gap-1.5">
-                            @foreach($sites as $siteKey => $siteDesc)
-                                <label class="cursor-pointer">
-                                    <input type="radio" 
-                                           name="site" 
-                                           value="{{ $siteKey }}" 
-                                           class="sr-only peer"
-                                           {{ $selectedSite === $siteKey ? 'checked' : '' }}
-                                           onchange="onModalSiteChange('{{ $siteKey }}')">
-                                    <div class="py-2.5 px-1 rounded-xl border border-slate-200 peer-checked:border-blue-600 peer-checked:bg-blue-50/80 peer-checked:text-blue-700 peer-checked:shadow-xs bg-white hover:bg-slate-50 text-center transition-all">
-                                        <span class="text-xs font-bold block leading-tight">{{ $siteKey }}</span>
-                                    </div>
-                                </label>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <!-- 2. Category Selection -->
-                    <div>
-                        <label class="block text-xs font-bold text-slate-800 mb-1.5">
-                            2. Kategori Material
-                        </label>
-                        <div class="grid grid-cols-2 gap-2.5">
-                            <label class="cursor-pointer">
-                                <input type="radio" 
-                                       name="category" 
-                                       value="Dressing" 
-                                       class="sr-only peer"
-                                       {{ $selectedCategory === 'Dressing' ? 'checked' : '' }}
-                                       onchange="onModalCategoryChange('Dressing')">
-                                <div class="p-3 rounded-xl border border-slate-200 peer-checked:border-indigo-600 peer-checked:bg-indigo-50/70 bg-white hover:bg-slate-50 text-left transition-all">
-                                    <div class="flex items-center justify-between">
-                                        <div class="text-xs font-bold text-slate-900 peer-checked:text-indigo-700">Dressing</div>
-                                        <svg class="w-4 h-4 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-                                        </svg>
-                                    </div>
-                                    <div class="text-[10px] text-slate-500 mt-0.5 font-medium">Roll, Stone, Tooling & Blade</div>
-                                </div>
-                            </label>
-
-                            <label class="cursor-pointer">
-                                <input type="radio" 
-                                       name="category" 
-                                       value="Consumable" 
-                                       class="sr-only peer"
-                                       {{ $selectedCategory === 'Consumable' ? 'checked' : '' }}
-                                       onchange="onModalCategoryChange('Consumable')">
-                                <div class="p-3 rounded-xl border border-slate-200 peer-checked:border-amber-600 peer-checked:bg-amber-50/70 bg-white hover:bg-slate-50 text-left transition-all">
-                                    <div class="flex items-center justify-between">
-                                        <div class="text-xs font-bold text-slate-900 peer-checked:text-amber-700">Consumable</div>
-                                        <svg class="w-4 h-4 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
-                                        </svg>
-                                    </div>
-                                    <div class="text-[10px] text-slate-500 mt-0.5 font-medium">Film, Ribbon & Strapping</div>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- 3. Pallet Number 1 - 500 -->
-                    <div class="bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200/80 space-y-2">
-                        <div class="flex items-center justify-between">
-                            <label for="modal_pallet_number" class="text-xs font-bold text-slate-800">
-                                3. Nomor Pallet (1 s/d 500)
-                            </label>
-                            <span class="text-[11px] font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
-                                Rentang: 1 - 500
-                            </span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button type="button" onclick="adjustModalPallet(-1)" class="w-10 h-10 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-bold text-sm flex items-center justify-center shadow-xs transition">-1</button>
-                            <div class="relative flex-1">
-                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 font-mono font-bold text-sm">#</span>
-                                <input type="number" 
-                                       name="pallet_number" 
-                                       id="modal_pallet_number" 
-                                       min="1" 
-                                       max="500" 
-                                       value="1" 
-                                       required 
-                                       oninput="onModalPalletInput(this.value)"
-                                       class="w-full text-center py-2 bg-white border border-slate-200 rounded-xl text-slate-900 font-mono text-lg font-extrabold focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-xs">
-                            </div>
-                            <button type="button" onclick="adjustModalPallet(1)" class="w-10 h-10 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-bold text-sm flex items-center justify-center shadow-xs transition">+1</button>
-                        </div>
-                        <div class="pt-1">
-                            <input type="range" 
-                                   id="modalPalletSlider" 
-                                   min="1" 
-                                   max="500" 
-                                   value="1" 
-                                   oninput="document.getElementById('modal_pallet_number').value = this.value; onModalPalletInput(this.value);"
-                                   class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
-                        </div>
-                    </div>
-
-                    <!-- 4. Material & Specs -->
-                    <div class="space-y-3 pt-1">
-                        <div>
-                            <label for="modal_material_name" class="block text-xs font-bold text-slate-800 mb-1">
-                                Deskripsi Material
-                            </label>
-                            <input type="text" 
-                                   name="material_name" 
-                                   id="modal_material_name" 
-                                   value="Roll Dressing Unit 450mm"
-                                   oninput="updateModalPreview()"
-                                   class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-xs">
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-2.5">
-                            <div>
-                                <label for="modal_batch_no" class="block text-xs font-bold text-slate-800 mb-1">
-                                    No. Batch
-                                </label>
-                                <input type="text" 
-                                       name="batch_no" 
-                                       id="modal_batch_no" 
-                                       value="BATCH-{{ date('Ymd') }}-001"
-                                       oninput="updateModalPreview()"
-                                       class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-mono text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-xs">
-                            </div>
-                            <div>
-                                <label for="modal_quantity" class="block text-xs font-bold text-slate-800 mb-1">
-                                    Jumlah / Qty
-                                </label>
-                                <input type="text" 
-                                       name="quantity" 
-                                       id="modal_quantity" 
-                                       value="1 PALLET"
-                                       oninput="updateModalPreview()"
-                                       class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-xs">
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Right Live Preview (5 cols) -->
-                <div class="md:col-span-5 flex flex-col justify-between">
-                    <div>
-                        <div class="text-xs font-bold text-slate-700 mb-2 flex items-center justify-between">
-                            <span>Preview Sticker ANDRITZ</span>
-                            <span class="text-[10px] font-mono text-slate-400">ANDRITZ Standard</span>
-                        </div>
-                        
-                        <!-- ANDRITZ Pallet Sticker Card -->
-                        <x-andritz-sticker 
-                            :pallet-number="$selectedPallet" 
-                            :category="$selectedCategory" 
-                            :category-code="'I-COS'" 
-                            id-prefix="modalCard" />
-                    </div>
-
-                    <!-- Modal Action Buttons -->
-                    <div class="pt-5 space-y-2">
-                        <button type="button" 
-                                onclick="directDownloadFromModal()"
-                                class="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-500/20 active:scale-98 transition-all flex items-center justify-center gap-2">
-                            <svg class="w-4 h-4 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
-                            <span>Cetak Sticker PDF Sekarang</span>
-                        </button>
-
-                        <button type="submit" 
-                                name="action" 
-                                value="save"
-                                class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl border border-slate-200 transition-all">
-                            Simpan ke Database & Tambah ke Tabel
-                        </button>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </form>
-
-    </div>
 </div>
 
 <!-- ======================================================== -->
@@ -823,8 +538,8 @@
 
 @push('scripts')
 <script>
-    let currentFilterValue = 'ALL';
-    let currentFilterType = 'site'; // 'site' or 'category'
+    let currentSite = 'ALL';
+    let currentCategory = 'ALL';
     let currentSearchTerm = '';
 
     const siteCodeMap = {
@@ -836,74 +551,101 @@
     };
 
     document.addEventListener('DOMContentLoaded', function () {
-        calculateSiteCounts();
-        
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('filter_site')) {
-            applyFilter(urlParams.get('filter_site'), 'site');
-        } else if (urlParams.has('filter_category')) {
-            applyFilter(urlParams.get('filter_category'), 'category');
-        } else {
-            applyFilter('ALL', 'site');
+        const siteParam = urlParams.get('filter_site') || urlParams.get('site');
+        const catParam = urlParams.get('filter_category') || urlParams.get('category');
+
+        if (siteParam) {
+            currentSite = siteParam;
+            const siteSelect = document.getElementById('siteFilterSelect');
+            if (siteSelect) siteSelect.value = siteParam;
         }
+
+        if (catParam) {
+            currentCategory = catParam;
+        }
+
+        updateCategoryButtonStyles();
+        updateFilterBadge();
+        filterTableRows();
     });
 
-    function calculateSiteCounts() {
-        const rows = document.querySelectorAll('.pallet-row');
-        const counts = {
-            'OKI II': 0,
-            'IKPD': 0,
-            'IKPP': 0,
-            'TELL': 0,
-            'ISC': 0
-        };
-
-        rows.forEach(row => {
-            const site = row.getAttribute('data-site');
-            if (counts[site] !== undefined) {
-                counts[site]++;
-            }
-        });
-
-        if (document.getElementById('count_OKI_II')) document.getElementById('count_OKI_II').innerText = `(${counts['OKI II']})`;
-        if (document.getElementById('count_IKPD')) document.getElementById('count_IKPD').innerText = `(${counts['IKPD']})`;
-        if (document.getElementById('count_IKPP')) document.getElementById('count_IKPP').innerText = `(${counts['IKPP']})`;
-        if (document.getElementById('count_TELL')) document.getElementById('count_TELL').innerText = `(${counts['TELL']})`;
-        if (document.getElementById('count_ISC')) document.getElementById('count_ISC').innerText = `(${counts['ISC']})`;
-    }
-
-    /**
-     * Automatic instant filtering without page reload
-     */
-    function applyFilter(filterVal, filterType = 'site') {
-        currentFilterValue = filterVal;
-        currentFilterType = filterType;
-
-        updateFilterButtonStyles(filterVal);
+    function onSiteFilterChange(siteVal) {
+        currentSite = siteVal;
+        updateFilterBadge();
         filterTableRows();
     }
 
-    function updateFilterButtonStyles(activeVal) {
-        const buttons = document.querySelectorAll('.filter-btn');
+    function onCategoryFilterChange(catVal) {
+        currentCategory = catVal;
+        updateCategoryButtonStyles();
+        updateFilterBadge();
+        filterTableRows();
+    }
+
+    function resetAllFilters() {
+        currentSite = 'ALL';
+        currentCategory = 'ALL';
+        currentSearchTerm = '';
+        
+        const siteSelect = document.getElementById('siteFilterSelect');
+        if (siteSelect) siteSelect.value = 'ALL';
+
+        const searchInput = document.getElementById('liveSearchInput');
+        if (searchInput) searchInput.value = '';
+
+        updateCategoryButtonStyles();
+        updateFilterBadge();
+        filterTableRows();
+    }
+
+    // Backward compatibility helper
+    function applyFilter(val, type = 'site') {
+        if (type === 'site') {
+            onSiteFilterChange(val);
+            const siteSelect = document.getElementById('siteFilterSelect');
+            if (siteSelect) siteSelect.value = val;
+        } else if (type === 'category') {
+            onCategoryFilterChange(val);
+        }
+    }
+
+    function updateCategoryButtonStyles() {
+        const buttons = document.querySelectorAll('.cat-filter-btn');
         buttons.forEach(btn => {
-            btn.className = 'filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition-all flex items-center gap-1.5';
+            btn.className = 'cat-filter-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5';
         });
 
-        const activeBtn = document.getElementById('btn_filter_' + activeVal);
+        const activeBtn = document.getElementById('btn_cat_' + currentCategory);
         if (activeBtn) {
-            activeBtn.className = 'filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-150 flex items-center gap-2 bg-blue-600 text-white shadow-xs shadow-blue-500/30 border border-blue-600';
+            if (currentCategory === 'Dressing') {
+                activeBtn.className = 'cat-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-white text-indigo-700 shadow-xs transition-all flex items-center gap-1.5';
+            } else if (currentCategory === 'Consumable') {
+                activeBtn.className = 'cat-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-white text-amber-700 shadow-xs transition-all flex items-center gap-1.5';
+            } else {
+                activeBtn.className = 'cat-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-white text-blue-700 shadow-xs transition-all flex items-center gap-1.5';
+            }
         }
+    }
 
+    function updateFilterBadge() {
         const badge = document.getElementById('activeFilterBadge');
-        if (activeVal === 'ALL') {
-            badge.innerText = 'Semua Site (Seluruh Data)';
+        if (!badge) return;
+
+        if (currentSite === 'ALL' && currentCategory === 'ALL') {
+            badge.innerText = 'Semua Site & Kategori (Seluruh Data)';
             badge.className = 'font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-lg text-[11px]';
-        } else if (activeVal === 'Dressing' || activeVal === 'Consumable') {
-            badge.innerText = `Kategori: ${activeVal}`;
-            badge.className = 'font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-lg text-[11px]';
+        } else if (currentSite !== 'ALL' && currentCategory === 'ALL') {
+            badge.innerText = `Site: ${currentSite}`;
+            badge.className = 'font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-lg text-[11px]';
+        } else if (currentSite === 'ALL' && currentCategory !== 'ALL') {
+            badge.innerText = `Kategori: ${currentCategory}`;
+            badge.className = (currentCategory === 'Dressing')
+                ? 'font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-lg text-[11px]'
+                : 'font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-lg text-[11px]';
         } else {
-            badge.innerText = `Site: ${activeVal}`;
-            badge.className = 'font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-lg text-[11px]';
+            badge.innerText = `Site: ${currentSite} • Kategori: ${currentCategory}`;
+            badge.className = 'font-bold text-slate-800 bg-slate-100 border border-slate-300 px-2.5 py-0.5 rounded-lg text-[11px]';
         }
     }
 
@@ -920,18 +662,13 @@
             const rowSite = row.getAttribute('data-site');
             const rowCategory = row.getAttribute('data-category');
             const rowPallet = row.getAttribute('data-pallet');
-            const rowMaterial = row.getAttribute('data-material') || '';
-            const rowCode = row.getAttribute('data-code') || '';
-            const rowBatch = row.getAttribute('data-batch') || '';
+            const rowMaterial = (row.getAttribute('data-material') || '').toLowerCase();
+            const rowCode = (row.getAttribute('data-code') || '').toLowerCase();
+            const rowBatch = (row.getAttribute('data-batch') || '').toLowerCase();
+            const rowNotes = (row.getAttribute('data-notes') || '').toLowerCase();
 
-            let matchFilter = true;
-            if (currentFilterValue !== 'ALL') {
-                if (currentFilterType === 'site') {
-                    matchFilter = (rowSite === currentFilterValue);
-                } else if (currentFilterType === 'category') {
-                    matchFilter = (rowCategory === currentFilterValue);
-                }
-            }
+            const matchSite = (currentSite === 'ALL' || rowSite === currentSite);
+            const matchCategory = (currentCategory === 'ALL' || rowCategory === currentCategory);
 
             let matchSearch = true;
             if (currentSearchTerm) {
@@ -939,10 +676,11 @@
                               rowMaterial.includes(currentSearchTerm) ||
                               rowCode.includes(currentSearchTerm) ||
                               rowBatch.includes(currentSearchTerm) ||
+                              rowNotes.includes(currentSearchTerm) ||
                               rowSite.toLowerCase().includes(currentSearchTerm);
             }
 
-            if (matchFilter && matchSearch) {
+            if (matchSite && matchCategory && matchSearch) {
                 row.classList.remove('hidden');
                 visibleCount++;
                 const indexCell = row.querySelector('.row-index');
@@ -952,7 +690,10 @@
             }
         });
 
-        document.getElementById('visibleRowCount').innerText = visibleCount;
+        const visibleRowCountEl = document.getElementById('visibleRowCount');
+        if (visibleRowCountEl) {
+            visibleRowCountEl.innerText = visibleCount;
+        }
 
         const noResultsRow = document.getElementById('noResultsFilteredRow');
         if (noResultsRow) {

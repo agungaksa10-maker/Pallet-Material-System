@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MasterMaterial;
 use App\Models\PalletComponent;
 use App\Models\PalletSticker;
 use App\Services\BarcodeService;
@@ -35,26 +36,17 @@ class PalletController extends Controller
     ];
 
     /**
-     * Preset materials for convenience
+     * Preset materials (empty by default, users input real material data).
      */
     public const MATERIAL_PRESETS = [
-        'Dressing' => [
-            'Roll Dressing Unit 450mm',
-            'Diamond Dressing Tool #40',
-            'Dressing Blade Heavy Duty',
-            'Grinding Wheel Dressing Stone',
-            'Polishing Pad Dressing Block',
-            'Superabrasive Dressing Roller',
-        ],
-        'Consumable' => [
-            'Stretch Film Roll 500mm x 300m',
-            'Strapping Band Heavy Duty 15mm',
-            'Thermal Transfer Ribbon 110mm x 300m',
-            'Corrugated Edge / Corner Protector',
-            'Pallet Cover Plastic Bag Heavy Duty',
-            'Desiccant Silica Gel 500g Pack',
-        ],
+        'Dressing' => [],
+        'Consumable' => [],
     ];
+
+    /**
+     * Spare parts catalog (empty by default, users input real spare part data).
+     */
+    public const SPAREPART_CATALOG = [];
 
     /**
      * Display main pallet sticker generator dashboard.
@@ -84,6 +76,7 @@ class PalletController extends Controller
                 $q->where('pallet_code', 'like', "%{$search}%")
                     ->orWhere('material_name', 'like', "%{$search}%")
                     ->orWhere('batch_no', 'like', "%{$search}%")
+                    ->orWhere('notes', 'like', "%{$search}%")
                     ->orWhere('pallet_number', (int) $search);
             });
         }
@@ -136,11 +129,13 @@ class PalletController extends Controller
             'sites' => self::SITES,
             'categories' => self::CATEGORIES,
             'materialPresets' => self::MATERIAL_PRESETS,
+            'catalog' => self::SPAREPART_CATALOG,
             'selectedSite' => $selectedSite,
             'selectedCategory' => $selectedCategory,
             'selectedPallet' => $selectedPallet,
             'usedPalletsBySite' => $usedPalletsBySite,
             'usedPalletNumbers' => $usedPalletsBySite[$selectedSite] ?? [],
+            'masterMaterials' => MasterMaterial::active()->orderBy('name')->get(),
         ]);
     }
 
@@ -198,7 +193,7 @@ class PalletController extends Controller
                 if (! empty(trim($comp['component_name'] ?? ''))) {
                     $componentsData[] = [
                         'component_name' => trim($comp['component_name']),
-                        'quantity' => ($comp['quantity'] ?? null) ?: '1 UNIT',
+                        'quantity' => ($comp['quantity'] ?? null) ?: '1',
                         'batch_no' => ($comp['batch_no'] ?? null) ?: $batchNo,
                         'notes' => $comp['notes'] ?? null,
                     ];
@@ -230,7 +225,7 @@ class PalletController extends Controller
                 'pallet_code' => $palletCode,
                 'material_name' => $summaryMaterial,
                 'batch_no' => $batchNo,
-                'quantity' => ($validated['quantity'] ?? null) ?: count($componentsData).' Items',
+                'quantity' => ($validated['quantity'] ?? null) ?: (string) count($componentsData),
                 'notes' => $validated['notes'] ?? null,
                 'user_id' => $userId,
                 'printed_at' => now(),
@@ -291,6 +286,7 @@ class PalletController extends Controller
                     $stickersData[] = [
                         'site' => $site,
                         'category' => $category,
+                        'category_code' => 'I-COS',
                         'pallet_number' => $num,
                         'pallet_code' => $code,
                         'material_name' => $material,
@@ -333,10 +329,18 @@ class PalletController extends Controller
             }
         }
 
+        if ($request->query('mode') === 'print' || $request->query('mode') === 'html') {
+            return response()->view('pdf.sticker', [
+                'stickers' => $stickersData,
+                'autoPrint' => ($request->query('mode') === 'print'),
+            ]);
+        }
+
         $pdf = Pdf::loadView('pdf.sticker', ['stickers' => $stickersData]);
 
         // Landscape paper matching ANDRITZ pallet sticker ratio (~150mm x 115mm)
-        $pdf->setPaper([0, 0, 430.00, 345.00], 'landscape');
+        // Set portrait with [0, 0, 430, 345] because Dompdf swaps indices when set to 'landscape'
+        $pdf->setPaper([0, 0, 430.00, 345.00], 'portrait');
         $pdf->setOptions([
             'isHtml5ParserEnabled' => true,
             'isRemoteEnabled' => true,
@@ -415,8 +419,10 @@ class PalletController extends Controller
             'sites' => self::SITES,
             'categories' => self::CATEGORIES,
             'materialPresets' => self::MATERIAL_PRESETS,
+            'catalog' => self::SPAREPART_CATALOG,
             'usedPalletsBySite' => $usedPalletsBySite,
             'usedPalletNumbers' => $usedPalletsBySite[$sticker->site] ?? [],
+            'masterMaterials' => MasterMaterial::active()->orderBy('name')->get(),
         ]);
     }
 
@@ -470,7 +476,7 @@ class PalletController extends Controller
                 if (! empty(trim($comp['component_name'] ?? ''))) {
                     $componentsData[] = [
                         'component_name' => trim($comp['component_name']),
-                        'quantity' => ($comp['quantity'] ?? null) ?: '1 UNIT',
+                        'quantity' => ($comp['quantity'] ?? null) ?: '1',
                         'batch_no' => ($comp['batch_no'] ?? null) ?: $batchNo,
                         'notes' => $comp['notes'] ?? null,
                     ];
@@ -501,7 +507,7 @@ class PalletController extends Controller
                 'pallet_code' => $palletCode,
                 'material_name' => $summaryMaterial,
                 'batch_no' => $batchNo,
-                'quantity' => ($validated['quantity'] ?? null) ?: count($componentsData).' Items',
+                'quantity' => ($validated['quantity'] ?? null) ?: (string) count($componentsData),
                 'notes' => $validated['notes'] ?? null,
             ]);
 
@@ -540,7 +546,8 @@ class PalletController extends Controller
                     ->orWhere('notes', 'like', "%{$search}%")
                     ->orWhereHas('palletSticker', function ($sub) use ($search) {
                         $sub->where('pallet_code', 'like', "%{$search}%")
-                            ->orWhere('pallet_number', (int) $search);
+                            ->orWhere('pallet_number', (int) $search)
+                            ->orWhere('notes', 'like', "%{$search}%");
                     });
             });
         }

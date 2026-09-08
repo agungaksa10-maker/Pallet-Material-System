@@ -228,12 +228,12 @@ class PalletComponentFeatureTest extends TestCase
 
         $response->assertStatus(200);
         // Must show IKPP Pallets with Knife Run
-        $response->assertSee('PLT-IKPP-DRS-001');
-        $response->assertSee('PLT-IKPP-DRS-002');
+        $response->assertSee('Pallet #1');
+        $response->assertSee('Pallet #2');
         // Must NOT show non-matching Pallet 3
-        $response->assertDontSee('PLT-IKPP-CON-003');
+        $response->assertDontSee('Pallet #3');
         // Must NOT show OKI II Pallet because site filter is IKPP
-        $response->assertDontSee('PLT-OKI2-DRS-001');
+        $response->assertDontSee('Knife Run OKI');
     }
 
     public function test_user_can_edit_pallet_components(): void
@@ -249,7 +249,7 @@ class PalletComponentFeatureTest extends TestCase
         PalletComponent::create([
             'pallet_sticker_id' => $sticker->id,
             'component_name' => 'Old Tool',
-            'quantity' => '1 UNIT',
+            'quantity' => '1',
         ]);
 
         $response = $this->actingAs($this->user)->put("/pallet/{$sticker->id}", [
@@ -283,5 +283,86 @@ class PalletComponentFeatureTest extends TestCase
             'pallet_sticker_id' => $sticker->id,
             'component_name' => 'Old Tool',
         ]);
+    }
+
+    public function test_create_view_renders_clean_real_material_input_section_without_dummy_data(): void
+    {
+        $response = $this->actingAs($this->user)->get('/pallet/create');
+
+        $response->assertStatus(200);
+        $response->assertSee('DAFTAR MATERIAL / SPARE PART PALLET (INPUT DATA ASLI)');
+        $response->assertSee('Tambah Material / Spare Part Asli');
+        $response->assertSee('Belum ada material / spare part yang diinput');
+        $response->assertDontSee('INV-T0001-ISC');
+        $response->assertDontSee('SELECT SPARE PARTS (FROM SOURCE SITE)');
+    }
+
+    public function test_can_create_pallet_with_real_spare_parts_and_multiple_items(): void
+    {
+        $response = $this->actingAs($this->user)->post('/pallet', [
+            'site' => 'IKPP',
+            'category' => 'Dressing',
+            'pallet_number' => 88,
+            'components' => [
+                [
+                    'component_name' => '300944956 - TURNKNIFE TK IV 330mm HHQ',
+                    'quantity' => '12 UNIT',
+                    'batch_no' => 'BATCH-893',
+                    'notes' => 'TK IV 330mm HHQ',
+                ],
+                [
+                    'component_name' => '301843716 - DISC PLATE',
+                    'quantity' => '2 PCS',
+                    'batch_no' => 'BATCH-001',
+                    'notes' => 'DISC PLATE',
+                ],
+            ],
+            'action' => 'save',
+        ]);
+
+        $response->assertRedirect();
+
+        $sticker = PalletSticker::where('site', 'IKPP')
+            ->where('pallet_number', 88)
+            ->first();
+
+        $this->assertNotNull($sticker);
+        $this->assertDatabaseHas('pallet_components', [
+            'pallet_sticker_id' => $sticker->id,
+            'component_name' => '300944956 - TURNKNIFE TK IV 330mm HHQ',
+            'quantity' => '12 UNIT',
+        ]);
+        $this->assertDatabaseHas('pallet_components', [
+            'pallet_sticker_id' => $sticker->id,
+            'component_name' => '301843716 - DISC PLATE',
+            'quantity' => '2 PCS',
+        ]);
+    }
+
+    public function test_edit_view_renders_real_material_input_section_and_preloads_components(): void
+    {
+        $sticker = PalletSticker::create([
+            'site' => 'IKPP',
+            'category' => 'Dressing',
+            'pallet_number' => 89,
+            'pallet_code' => 'PLT-IKPP-DRS-089',
+            'material_name' => '300944956 - TURNKNIFE TK IV 330mm HHQ',
+            'user_id' => 'operator01',
+        ]);
+        PalletComponent::create([
+            'pallet_sticker_id' => $sticker->id,
+            'component_name' => '300944956 - TURNKNIFE TK IV 330mm HHQ',
+            'quantity' => '5 UNIT',
+            'batch_no' => 'BATCH-893',
+            'notes' => 'TK IV 330mm HHQ',
+        ]);
+
+        $response = $this->actingAs($this->user)->get("/pallet/{$sticker->id}/edit");
+
+        $response->assertStatus(200);
+        $response->assertSee('DAFTAR MATERIAL / SPARE PART PALLET (INPUT DATA ASLI)');
+        $response->assertSee('300944956 - TURNKNIFE TK IV 330mm HHQ');
+        $response->assertDontSee('INV-T0001-ISC');
+        $response->assertDontSee('SELECT SPARE PARTS (FROM SOURCE SITE)');
     }
 }
