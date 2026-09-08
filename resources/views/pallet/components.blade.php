@@ -185,6 +185,7 @@
                         <tr class="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold text-[11px] uppercase tracking-wider">
                             <th class="py-3.5 px-4 sm:px-6">Nama Komponen</th>
                             <th class="py-3.5 px-4">Nomor Pallet</th>
+                            <th class="py-3.5 px-4 text-center">Lokasi Rak</th>
                             <th class="py-3.5 px-4">Site Pabrik</th>
                             <th class="py-3.5 px-4">Kategori</th>
                             <th class="py-3.5 px-4">Catatan</th>
@@ -204,6 +205,8 @@
                                     'ISC' => 'bg-cyan-50 text-cyan-700 border-cyan-200',
                                     default => 'bg-slate-50 text-slate-700 border-slate-200',
                                 };
+                                $itemKolom = $item->kolom ?: $pallet?->kolom;
+                                $itemTingkat = $item->tingkat ?: $pallet?->tingkat;
                             @endphp
                             <tr class="hover:bg-blue-50/30 transition-colors group">
                                 
@@ -220,6 +223,17 @@
                                     <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-lg bg-slate-900 text-white font-mono font-black text-xs shadow-xs">
                                         Pallet #{{ $pallet?->pallet_number }}
                                     </span>
+                                </td>
+
+                                <!-- Lokasi Rak -->
+                                <td class="py-4 px-4 whitespace-nowrap text-center">
+                                    @if(!empty($itemKolom) || !empty($itemTingkat))
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg font-mono font-extrabold text-xs bg-blue-50 text-blue-800 border border-blue-200 shadow-2xs whitespace-nowrap">
+                                            {{ $itemKolom ? 'Kolom '.$itemKolom : '' }}{{ $itemKolom && $itemTingkat ? ' • ' : '' }}{{ $itemTingkat ? 'Tingkat '.$itemTingkat : '' }}
+                                        </span>
+                                    @else
+                                        <span class="text-slate-300 italic text-xs">&mdash;</span>
+                                    @endif
                                 </td>
 
                                 <!-- Site -->

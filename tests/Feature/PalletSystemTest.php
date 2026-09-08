@@ -39,7 +39,7 @@ class PalletSystemTest extends TestCase
         $response = $this->get('/login');
 
         $response->assertStatus(200);
-        $response->assertSee('PALLET');
+        $response->assertSee('Box Locator');
         $response->assertSee('User ID Terdaftar');
     }
 

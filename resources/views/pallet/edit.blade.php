@@ -388,65 +388,96 @@
 
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs">
-                            <!-- ID Material -->
-                            <div class="sm:col-span-3">
-                                <label class="text-[10px] font-bold text-slate-600 block mb-1">ID Material / Kode Part</label>
-                                <input type="text" 
-                                       id="newPartCode" 
-                                       oninput="onPartCodeInput(this.value)"
-                                       placeholder="Misal: 300944956 atau T0001 (opsional)" 
-                                       class="w-full px-2.5 py-2 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
+                        <!-- Form Input Komponen Material (2 Baris Rapi & Proporsional) -->
+                        <div class="p-3.5 bg-slate-50/75 border border-slate-200/80 rounded-xl space-y-3">
+                            <!-- Baris 1: ID Material & Nama Material (Lega & Leluasa) -->
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                                <!-- ID Material -->
+                                <div class="sm:col-span-4">
+                                    <label class="text-[11px] font-bold text-slate-700 block mb-1">ID Material / Kode Part</label>
+                                    <input type="text" 
+                                           id="newPartCode" 
+                                           oninput="onPartCodeInput(this.value)"
+                                           placeholder="Misal: 300944956" 
+                                           class="w-full h-10 px-3 bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
+                                </div>
+
+                                <!-- Nama Material / Spare Part (Required) -->
+                                <div class="sm:col-span-8">
+                                    <label class="text-[11px] font-bold text-slate-700 block mb-1">Nama Material / Sparepart <span class="text-rose-500">*</span></label>
+                                    <input type="text" 
+                                           id="newPartName" 
+                                           list="masterMaterialDatalist"
+                                           oninput="onPartNameInput(this.value)"
+                                           onkeydown="if(event.key === 'Enter'){ event.preventDefault(); addRealMaterialItem(); }"
+                                           placeholder="Ketik atau pilih nama material / sparepart..." 
+                                           class="w-full h-10 px-3 bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
+                                    <datalist id="masterMaterialDatalist">
+                                        @foreach(($masterMaterials ?? []) as $mm)
+                                            <option value="{{ $mm->name }}">{{ $mm->item_code ? 'Kode: '.$mm->item_code.' | ' : '' }}{{ $mm->default_unit }}</option>
+                                        @endforeach
+                                    </datalist>
+                                </div>
                             </div>
 
-                            <!-- Nama Material / Spare Part (Required) -->
-                            <div class="sm:col-span-5">
-                                <label class="text-[10px] font-bold text-slate-600 block mb-1">Nama Material / Sparepart *</label>
-                                <input type="text" 
-                                       id="newPartName" 
-                                       list="masterMaterialDatalist"
-                                       oninput="onPartNameInput(this.value)"
-                                       onkeydown="if(event.key === 'Enter'){ event.preventDefault(); addRealMaterialItem(); }"
-                                       placeholder="Misal: TURNKNIFE TK IV 330mm HHQ, Roll Dressing..." 
-                                       class="w-full px-2.5 py-2 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
-                                <datalist id="masterMaterialDatalist">
-                                    @foreach(($masterMaterials ?? []) as $mm)
-                                        <option value="{{ $mm->name }}">{{ $mm->item_code ? 'Kode: '.$mm->item_code.' | ' : '' }}{{ $mm->default_unit }}</option>
-                                    @endforeach
-                                </datalist>
-                            </div>
+                            <!-- Baris 2: Qty, No. Batch, Kolom Rak, Tingkat Rak, & Tombol Tambah (Sejajar Sempurna) -->
+                            <div class="grid grid-cols-2 sm:grid-cols-12 gap-2.5 items-end">
+                                <!-- Jumlah / Qty -->
+                                <div class="col-span-1 sm:col-span-2">
+                                    <label class="text-[11px] font-bold text-slate-700 block mb-1 whitespace-nowrap">Jumlah (Qty) <span class="text-rose-500">*</span></label>
+                                    <input type="text" 
+                                           id="newPartQty" 
+                                           value="1"
+                                           onkeydown="if(event.key === 'Enter'){ event.preventDefault(); addRealMaterialItem(); }"
+                                           placeholder="Misal: 1" 
+                                           class="w-full h-10 px-2 bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 text-center focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
+                                </div>
 
-                            <!-- Jumlah / Qty -->
-                            <div class="sm:col-span-2">
-                                <label class="text-[10px] font-bold text-slate-600 block mb-1">Jumlah (Qty) *</label>
-                                <input type="text" 
-                                       id="newPartQty" 
-                                       value="1"
-                                       onkeydown="if(event.key === 'Enter'){ event.preventDefault(); addRealMaterialItem(); }"
-                                       placeholder="Misal: 1, 10, 25" 
-                                       class="w-full px-2.5 py-2 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 text-center focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
-                            </div>
+                                <!-- No. Batch -->
+                                <div class="col-span-1 sm:col-span-3">
+                                    <label class="text-[11px] font-bold text-slate-700 block mb-1 whitespace-nowrap">No. Batch</label>
+                                    <input type="text" 
+                                           id="newPartBatch" 
+                                           placeholder="Opsional" 
+                                           class="w-full h-10 px-3 bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-lg text-xs font-mono text-slate-700 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
+                                </div>
 
-                            <!-- No. Batch -->
-                            <div class="sm:col-span-2">
-                                <label class="text-[10px] font-bold text-slate-600 block mb-1">No. Batch</label>
-                                <input type="text" 
-                                       id="newPartBatch" 
-                                       placeholder="Opsional" 
-                                       class="w-full px-2.5 py-2 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-lg text-xs font-mono text-slate-700 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
-                            </div>
-                        </div>
+                                <!-- Kolom (A sampai Z) -->
+                                <div class="col-span-1 sm:col-span-2">
+                                    <label class="text-[11px] font-bold text-slate-700 block mb-1 whitespace-nowrap" title="Kolom Rak (A sampai Z)">Kolom Rak</label>
+                                    <select id="newPartKolom" 
+                                            class="w-full h-10 px-2 bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-lg text-xs font-extrabold text-blue-700 text-center focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition cursor-pointer">
+                                        <option value="">- Pilih -</option>
+                                        @foreach(range('A', 'Z') as $char)
+                                            <option value="{{ $char }}">{{ $char }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
-                        <!-- Action Button -->
-                        <div class="flex justify-end pt-1">
-                            <button type="button" 
-                                    onclick="addRealMaterialItem()" 
-                                    class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-xs transition active:scale-95 flex items-center justify-center gap-1.5">
-                                <svg class="w-4 h-4 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                                </svg>
-                                <span>Tambah ke Pallet</span>
-                            </button>
+                                <!-- Tingkat (1 sampai 5) -->
+                                <div class="col-span-1 sm:col-span-2">
+                                    <label class="text-[11px] font-bold text-slate-700 block mb-1 whitespace-nowrap" title="Tingkat Rak (1 sampai 5)">Tingkat Rak</label>
+                                    <select id="newPartTingkat" 
+                                            class="w-full h-10 px-2 bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-lg text-xs font-extrabold text-indigo-700 text-center focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition cursor-pointer">
+                                        <option value="">- Pilih -</option>
+                                        @foreach(range(1, 5) as $lvl)
+                                            <option value="{{ $lvl }}">{{ $lvl }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <!-- Action Button -->
+                                <div class="col-span-2 sm:col-span-3">
+                                    <button type="button" 
+                                            onclick="addRealMaterialItem()" 
+                                            class="w-full h-10 px-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-[11.5px] shadow-xs transition active:scale-98 flex items-center justify-center gap-1 cursor-pointer">
+                                        <svg class="w-4 h-4 stroke-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                        </svg>
+                                        <span class="whitespace-nowrap">+ Tambah ke Pallet</span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -467,10 +498,11 @@
                                         <tr>
                                             <th scope="col" class="py-2.5 px-3 w-10 text-center">NO</th>
                                             <th scope="col" class="py-2.5 px-3 w-28">ID MATERIAL</th>
-                                            <th scope="col" class="py-2.5 px-3 min-w-[220px]">Nama Material / Sparepart</th>
-                                            <th scope="col" class="py-2.5 px-3 w-28 text-center">Jumlah / Qty</th>
-                                            <th scope="col" class="py-2.5 px-3 w-32">No. Batch</th>
-                                            <th scope="col" class="py-2.5 px-2 w-16 text-center">Hapus</th>
+                                            <th scope="col" class="py-2.5 px-3 min-w-[200px]">Nama Material / Sparepart</th>
+                                            <th scope="col" class="py-2.5 px-3 w-24 text-center">Jumlah / Qty</th>
+                                            <th scope="col" class="py-2.5 px-3 w-28">No. Batch</th>
+                                            <th scope="col" class="py-2.5 px-3 w-32 text-center" title="Kolom A-Z & Tingkat 1-5">Lokasi Rak</th>
+                                            <th scope="col" class="py-2.5 px-2 w-14 text-center">Hapus</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100 bg-white" id="selectedTableBody">
@@ -510,36 +542,45 @@
                     <div id="hiddenFormComponents"></div>
 
                 </div>
-                <!-- 5. Quantity -->
-                <div class="space-y-1.5">
-                    <div class="flex items-center justify-between">
-                        <label for="quantity" class="text-xs font-bold text-slate-700">Jumlah / Satuan</label>
-                        <span class="text-[10px] text-slate-400">Default: 1</span>
-                    </div>
-                    <input type="text" 
-                           name="quantity" 
-                           id="quantity" 
-                           value="{{ old('quantity', $sticker->quantity) }}"
-                           oninput="onQuantityChange(this.value)"
-                           placeholder="Contoh: 1, 10, 25"
-                           class="w-full px-3 py-2 bg-slate-50 hover:bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-900 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition shadow-xs">
-                    @error('quantity')
-                        <p class="text-xs text-rose-600 font-semibold">{{ $message }}</p>
-                    @enderror
-                </div>
+                <!-- 5. Lokasi Rak & Keterangan Pallet -->
+                <div class="space-y-2.5 p-4 rounded-2xl bg-slate-50/90 border border-slate-200/90 shadow-2xs">
+                    <label class="text-xs font-extrabold text-slate-800 flex items-center justify-between">
+                        <span class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                            <span>Lokasi Rak Pallet &amp; Keterangan</span>
+                        </span>
+                        <span class="text-[11px] text-slate-400 font-semibold">(Opsional)</span>
+                    </label>
 
-                <!-- 6. Catatan Tambahan (Opsional) -->
-                <div class="space-y-1.5">
-                    <label for="notes" class="text-xs font-bold text-slate-700">Catatan Khusus / Lokasi Penyimpanan (Opsional)</label>
-                    <textarea name="notes" 
-                              id="notes" 
-                              rows="2" 
-                              oninput="onNotesChange(this.value)"
-                              placeholder="Keterangan tambahan untuk label atau tujuan pengiriman..."
-                              class="w-full px-3 py-2 bg-slate-50 hover:bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition shadow-xs">{{ old('notes', $sticker->notes) }}</textarea>
-                    @error('notes')
-                        <p class="text-xs text-rose-600 font-semibold">{{ $message }}</p>
-                    @enderror
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                        <div class="sm:col-span-3">
+                            <label for="pallet_kolom" class="text-[10px] font-bold text-slate-600 block mb-1">Kolom Rak (A - Z)</label>
+                            <select name="kolom" id="pallet_kolom" class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-xl text-xs font-extrabold text-blue-700 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition cursor-pointer">
+                                <option value="">-- Pilih Kolom --</option>
+                                @foreach(range('A', 'Z') as $char)
+                                    <option value="{{ $char }}" {{ old('kolom', $sticker->kolom) === $char ? 'selected' : '' }}>Kolom {{ $char }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="sm:col-span-3">
+                            <label for="pallet_tingkat" class="text-[10px] font-bold text-slate-600 block mb-1">Tingkat Rak (1 - 5)</label>
+                            <select name="tingkat" id="pallet_tingkat" class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-xl text-xs font-extrabold text-indigo-700 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition cursor-pointer">
+                                <option value="">-- Pilih Tingkat --</option>
+                                @foreach(range(1, 5) as $lvl)
+                                    <option value="{{ $lvl }}" {{ old('tingkat', $sticker->tingkat) == $lvl ? 'selected' : '' }}>Tingkat {{ $lvl }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="sm:col-span-6">
+                            <label for="notes" class="text-[10px] font-bold text-slate-600 block mb-1">Catatan / Keterangan Pallet</label>
+                            <input type="text" 
+                                   name="notes" 
+                                   id="notes" 
+                                   value="{{ old('notes', $sticker->notes) }}"
+                                   placeholder="Contoh: Rak Utama, Line Produksi 3..."
+                                   class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition shadow-xs">
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Submit Action Buttons -->
@@ -967,6 +1008,8 @@
                 'component_name' => $sticker->material_name,
                 'quantity' => $sticker->quantity,
                 'batch_no' => $sticker->batch_no,
+                'kolom' => $sticker->kolom,
+                'tingkat' => $sticker->tingkat,
                 'notes' => $sticker->notes,
             ]
         ]);
@@ -988,6 +1031,8 @@
                     name: name,
                     qty: comp.quantity || '1',
                     batch: comp.batch_no || '',
+                    kolom: comp.kolom || '',
+                    tingkat: comp.tingkat || '',
                     notes: comp.notes || ''
                 });
             }
@@ -1168,6 +1213,8 @@
         const nameInp = document.getElementById('newPartName');
         const qtyInp = document.getElementById('newPartQty');
         const batchInp = document.getElementById('newPartBatch');
+        const kolomInp = document.getElementById('newPartKolom');
+        const tingkatInp = document.getElementById('newPartTingkat');
         const notesInp = document.getElementById('newPartNotes');
 
         const name = nameInp ? nameInp.value.trim() : '';
@@ -1180,6 +1227,8 @@
         const code = codeInp ? codeInp.value.trim() : '';
         const qty = (qtyInp && qtyInp.value.trim()) ? qtyInp.value.trim() : '1';
         const batch = batchInp ? batchInp.value.trim() : '';
+        const kolom = kolomInp ? kolomInp.value.trim().toUpperCase() : '';
+        const tingkat = tingkatInp ? tingkatInp.value.trim() : '';
         const notes = notesInp ? notesInp.value.trim() : '';
 
         selectedItems.push({
@@ -1187,13 +1236,26 @@
             name: name,
             qty: qty,
             batch: batch,
+            kolom: kolom,
+            tingkat: tingkat,
             notes: notes
         });
+
+        const palletKolomEl = document.getElementById('pallet_kolom');
+        const palletTingkatEl = document.getElementById('pallet_tingkat');
+        if (palletKolomEl && !palletKolomEl.value && kolom) {
+            palletKolomEl.value = kolom;
+        }
+        if (palletTingkatEl && !palletTingkatEl.value && tingkat) {
+            palletTingkatEl.value = tingkat;
+        }
 
         if (codeInp) codeInp.value = '';
         if (nameInp) nameInp.value = '';
         if (qtyInp) qtyInp.value = '1';
         if (batchInp) batchInp.value = '';
+        if (kolomInp) kolomInp.value = '';
+        if (tingkatInp) tingkatInp.value = '';
         if (notesInp) notesInp.value = '';
 
         if (codeInp) {
@@ -1225,6 +1287,22 @@
         if (selectedItems[idx]) {
             selectedItems[idx].batch = val;
             updateHiddenFormInputs();
+        }
+    }
+
+    function updateSelectedKolom(idx, val) {
+        if (selectedItems[idx]) {
+            selectedItems[idx].kolom = val;
+            updateHiddenFormInputs();
+            refreshLivePreview();
+        }
+    }
+
+    function updateSelectedTingkat(idx, val) {
+        if (selectedItems[idx]) {
+            selectedItems[idx].tingkat = val;
+            updateHiddenFormInputs();
+            refreshLivePreview();
         }
     }
 
@@ -1262,6 +1340,11 @@
             emptyState.classList.add('hidden');
             let html = '';
             selectedItems.forEach((item, idx) => {
+                const kolomOptions = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+                    .map(ch => `<option value="${ch}" ${item.kolom === ch ? 'selected' : ''}>${ch}</option>`).join('');
+                const tingkatOptions = [1,2,3,4,5]
+                    .map(lvl => `<option value="${lvl}" ${String(item.tingkat) === String(lvl) ? 'selected' : ''}>${lvl}</option>`).join('');
+
                 html += `
                     <tr class="hover:bg-blue-50/30 transition">
                         <td class="py-2.5 px-3 text-center font-bold text-slate-400 text-xs">${idx + 1}</td>
@@ -1277,14 +1360,28 @@
                             <input type="text" 
                                    value="${escapeHtml(item.qty)}" 
                                    oninput="updateSelectedQty(${idx}, this.value)" 
-                                   class="w-24 px-2 py-1 bg-white border border-slate-300 rounded-lg text-center text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-100 shadow-2xs">
+                                   class="w-20 px-2 py-1 bg-white border border-slate-300 rounded-lg text-center text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-100 shadow-2xs">
                         </td>
                         <td class="py-2.5 px-3 whitespace-nowrap">
                             <input type="text" 
                                    value="${escapeHtml(item.batch || '')}" 
                                    placeholder="Default batch" 
                                    oninput="updateSelectedBatch(${idx}, this.value)" 
-                                   class="w-28 px-2 py-1 bg-white border border-slate-200 rounded-lg text-xs font-mono text-slate-700 focus:outline-none focus:border-blue-600">
+                                   class="w-24 px-2 py-1 bg-white border border-slate-200 rounded-lg text-xs font-mono text-slate-700 focus:outline-none focus:border-blue-600">
+                        </td>
+                        <td class="py-2.5 px-3 text-center whitespace-nowrap">
+                            <div class="inline-flex items-center gap-1 bg-slate-50 border border-slate-200 px-2 py-1 rounded-lg">
+                                <span class="text-[10px] font-bold text-slate-400">Kolom:</span>
+                                <select onchange="updateSelectedKolom(${idx}, this.value)" title="Pilih Kolom (A sampai Z)" class="px-1 py-0.5 bg-white border border-blue-200 rounded text-xs font-extrabold text-blue-700 cursor-pointer">
+                                    <option value="">-</option>
+                                    ${kolomOptions}
+                                </select>
+                                <span class="text-[10px] font-bold text-slate-400 ml-1">Tingkat:</span>
+                                <select onchange="updateSelectedTingkat(${idx}, this.value)" title="Pilih Tingkat (1 sampai 5)" class="px-1 py-0.5 bg-white border border-indigo-200 rounded text-xs font-extrabold text-indigo-700 cursor-pointer">
+                                    <option value="">-</option>
+                                    ${tingkatOptions}
+                                </select>
+                            </div>
                         </td>
                         <td class="py-2.5 px-2 text-center whitespace-nowrap">
                             <button type="button" 
@@ -1336,6 +1433,8 @@
                 <input type="hidden" name="components[${idx}][component_name]" value="${escapeHtml(fullName)}">
                 <input type="hidden" name="components[${idx}][quantity]" value="${escapeHtml(fullQty)}">
                 <input type="hidden" name="components[${idx}][batch_no]" value="${escapeHtml(batchVal)}">
+                <input type="hidden" name="components[${idx}][kolom]" value="${escapeHtml(item.kolom || '')}">
+                <input type="hidden" name="components[${idx}][tingkat]" value="${escapeHtml(item.tingkat || '')}">
                 <input type="hidden" name="components[${idx}][notes]" value="${escapeHtml(item.notes || '')}">
             `;
         });
@@ -1354,15 +1453,23 @@
                 validCount++;
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs';
+                
+                const locBadge = (item.kolom || item.tingkat) 
+                    ? `<span class="text-[9.5px] font-mono font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 shrink-0 whitespace-nowrap">${item.kolom ? `Kolom ${escapeHtml(item.kolom)}` : ''}${item.kolom && item.tingkat ? ' • ' : ''}${item.tingkat ? `Tingkat ${escapeHtml(item.tingkat)}` : ''}</span>`
+                    : '';
+
                 itemDiv.innerHTML = `
                     <div class="flex items-center gap-1.5 font-bold text-slate-800 truncate pr-2">
                         <span class="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span>
                         ${item.code ? `<span class="font-mono text-[10px] text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 font-bold shrink-0">${escapeHtml(item.code)}</span>` : ''}
                         <span class="truncate">${escapeHtml(item.name)}</span>
                     </div>
-                    <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800 shrink-0">
-                        ${escapeHtml(item.qty || '1')}
-                    </span>
+                    <div class="flex items-center gap-1 shrink-0">
+                        ${locBadge}
+                        <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800">
+                            ${escapeHtml(item.qty || '1')}
+                        </span>
+                    </div>
                 `;
                 previewList.appendChild(itemDiv);
             }

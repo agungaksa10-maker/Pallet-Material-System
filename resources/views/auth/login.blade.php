@@ -78,7 +78,7 @@
             </div>
 
             <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white drop-shadow-md">
-                PALLET Material System
+                Box Locator
             </h1>
         </div>
 

@@ -136,6 +136,30 @@
                             {{ $sticker->pallet_code }}
                         </div>
                     </div>
+
+                    @if(!empty($sticker->kolom) || !empty($sticker->tingkat))
+                        <div class="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200 space-y-1 sm:col-span-2">
+                            <div class="text-[11px] font-bold text-amber-800 uppercase tracking-wider flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-amber-600"></span>
+                                <span>Lokasi Rak Penyimpanan Pallet</span>
+                            </div>
+                            <div class="text-sm font-extrabold text-slate-900 flex items-center gap-2 flex-wrap pt-0.5">
+                                @if(!empty($sticker->kolom))
+                                    <span class="px-2.5 py-0.5 rounded-lg bg-white border border-amber-300 text-blue-800 font-black shadow-2xs">
+                                        Kolom {{ $sticker->kolom }}
+                                    </span>
+                                @endif
+                                @if(!empty($sticker->tingkat))
+                                    <span class="px-2.5 py-0.5 rounded-lg bg-white border border-amber-300 text-indigo-800 font-black shadow-2xs">
+                                        Tingkat {{ $sticker->tingkat }}
+                                    </span>
+                                @endif
+                                @if(!empty($sticker->notes))
+                                    <span class="text-xs font-medium text-slate-600 italic">({{ $sticker->notes }})</span>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -167,6 +191,7 @@
                                 <tr>
                                     <th class="px-3.5 py-2.5 w-10 text-center">NO</th>
                                     <th class="px-3.5 py-2.5">Nama Komponen / Material</th>
+                                    <th class="px-3.5 py-2.5 w-24 text-center">Lokasi Rak</th>
                                     <th class="px-3.5 py-2.5 w-28">Jumlah / Qty</th>
                                     <th class="px-3.5 py-2.5 w-36">Batch No</th>
                                     <th class="px-3.5 py-2.5">Catatan</th>
@@ -179,6 +204,15 @@
                                         <td class="px-3.5 py-2.5 font-bold text-slate-900 flex items-center gap-2">
                                             <span class="w-2 h-2 rounded-full bg-blue-500 shrink-0"></span>
                                             <span>{{ $comp->component_name }}</span>
+                                        </td>
+                                        <td class="px-3.5 py-2.5 text-center whitespace-nowrap">
+                                            @if(!empty($comp->kolom) || !empty($comp->tingkat))
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md font-mono font-bold text-[11px] bg-blue-50 text-blue-700 border border-blue-200 whitespace-nowrap">
+                                                    {{ $comp->kolom ? 'Kolom '.$comp->kolom : '' }}{{ $comp->kolom && $comp->tingkat ? ' • ' : '' }}{{ $comp->tingkat ? 'Tingkat '.$comp->tingkat : '' }}
+                                                </span>
+                                            @else
+                                                <span class="text-slate-300 italic text-xs">-</span>
+                                            @endif
                                         </td>
                                         <td class="px-3.5 py-2.5 font-bold text-slate-700 font-mono">{{ $comp->quantity ?: '-' }}</td>
                                         <td class="px-3.5 py-2.5 text-slate-600 font-mono text-[11px]">{{ $comp->batch_no ?: '-' }}</td>

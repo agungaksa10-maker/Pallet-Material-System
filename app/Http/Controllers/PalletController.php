@@ -76,11 +76,15 @@ class PalletController extends Controller
                 $q->where('pallet_code', 'like', "%{$search}%")
                     ->orWhere('material_name', 'like', "%{$search}%")
                     ->orWhere('batch_no', 'like', "%{$search}%")
+                    ->orWhere('kolom', 'like', "%{$search}%")
+                    ->orWhere('tingkat', 'like', "%{$search}%")
                     ->orWhere('notes', 'like', "%{$search}%")
                     ->orWhere('pallet_number', (int) $search)
                     ->orWhereHas('components', function ($cq) use ($search) {
                         $cq->where('component_name', 'like', "%{$search}%")
                             ->orWhere('batch_no', 'like', "%{$search}%")
+                            ->orWhere('kolom', 'like', "%{$search}%")
+                            ->orWhere('tingkat', 'like', "%{$search}%")
                             ->orWhere('notes', 'like', "%{$search}%");
                     });
             });
@@ -156,11 +160,15 @@ class PalletController extends Controller
             'material_name' => ['nullable', 'string', 'max:255'],
             'batch_no' => ['nullable', 'string', 'max:100'],
             'quantity' => ['nullable', 'string', 'max:100'],
+            'kolom' => ['nullable', 'string', 'max:10'],
+            'tingkat' => ['nullable', 'string', 'max:10'],
             'notes' => ['nullable', 'string', 'max:500'],
             'components' => ['nullable', 'array'],
             'components.*.component_name' => ['nullable', 'string', 'max:255'],
             'components.*.quantity' => ['nullable', 'string', 'max:100'],
             'components.*.batch_no' => ['nullable', 'string', 'max:100'],
+            'components.*.kolom' => ['nullable', 'string', 'max:10'],
+            'components.*.tingkat' => ['nullable', 'string', 'max:10'],
             'components.*.notes' => ['nullable', 'string', 'max:500'],
             'action' => ['nullable', 'string', 'in:save,print,range_print'],
             'range_start' => ['nullable', 'integer', 'min:1', 'max:500'],
@@ -200,6 +208,8 @@ class PalletController extends Controller
                         'component_name' => trim($comp['component_name']),
                         'quantity' => ($comp['quantity'] ?? null) ?: '1',
                         'batch_no' => ($comp['batch_no'] ?? null) ?: $batchNo,
+                        'kolom' => ! empty($comp['kolom']) ? strtoupper(trim($comp['kolom'])) : null,
+                        'tingkat' => ! empty($comp['tingkat']) ? trim($comp['tingkat']) : null,
                         'notes' => $comp['notes'] ?? null,
                     ];
                 }
@@ -213,8 +223,24 @@ class PalletController extends Controller
                 'component_name' => $defaultMaterial,
                 'quantity' => ($validated['quantity'] ?? null) ?: '1 PALLET',
                 'batch_no' => $batchNo,
+                'kolom' => ! empty($validated['kolom']) ? strtoupper(trim($validated['kolom'])) : null,
+                'tingkat' => ! empty($validated['tingkat']) ? trim($validated['tingkat']) : null,
                 'notes' => $validated['notes'] ?? null,
             ];
+        }
+
+        // Determine pallet-level kolom & tingkat: from request or first non-empty component
+        $palletKolom = ! empty($validated['kolom']) ? strtoupper(trim($validated['kolom'])) : null;
+        $palletTingkat = ! empty($validated['tingkat']) ? trim($validated['tingkat']) : null;
+        if (! $palletKolom || ! $palletTingkat) {
+            foreach ($componentsData as $cd) {
+                if (! $palletKolom && ! empty($cd['kolom'])) {
+                    $palletKolom = $cd['kolom'];
+                }
+                if (! $palletTingkat && ! empty($cd['tingkat'])) {
+                    $palletTingkat = $cd['tingkat'];
+                }
+            }
         }
 
         $componentNames = array_column($componentsData, 'component_name');
@@ -222,7 +248,7 @@ class PalletController extends Controller
             ? implode(', ', $componentNames)
             : 'Standard Material';
 
-        $sticker = DB::transaction(function () use ($validated, $palletCode, $summaryMaterial, $batchNo, $userId, $componentsData) {
+        $sticker = DB::transaction(function () use ($validated, $palletCode, $summaryMaterial, $batchNo, $userId, $componentsData, $palletKolom, $palletTingkat) {
             $record = PalletSticker::create([
                 'site' => $validated['site'],
                 'category' => $validated['category'],
@@ -231,6 +257,8 @@ class PalletController extends Controller
                 'material_name' => $summaryMaterial,
                 'batch_no' => $batchNo,
                 'quantity' => ($validated['quantity'] ?? null) ?: (string) count($componentsData),
+                'kolom' => $palletKolom,
+                'tingkat' => $palletTingkat,
                 'notes' => $validated['notes'] ?? null,
                 'user_id' => $userId,
                 'printed_at' => now(),
@@ -383,6 +411,8 @@ class PalletController extends Controller
             'material_name' => $sticker->material_name ?: 'Standard Material',
             'batch_no' => $sticker->batch_no ?: 'BATCH-'.date('Ymd'),
             'quantity' => $sticker->quantity ?: '1 PALLET',
+            'kolom' => $sticker->kolom,
+            'tingkat' => $sticker->tingkat,
             'notes' => $sticker->notes,
             'user_id' => $sticker->user_id ?: 'OPERATOR',
             'printed_at' => $sticker->printed_at ?: now(),
@@ -445,11 +475,15 @@ class PalletController extends Controller
             'material_name' => ['nullable', 'string', 'max:255'],
             'batch_no' => ['nullable', 'string', 'max:100'],
             'quantity' => ['nullable', 'string', 'max:100'],
+            'kolom' => ['nullable', 'string', 'max:10'],
+            'tingkat' => ['nullable', 'string', 'max:10'],
             'notes' => ['nullable', 'string', 'max:500'],
             'components' => ['nullable', 'array'],
             'components.*.component_name' => ['nullable', 'string', 'max:255'],
             'components.*.quantity' => ['nullable', 'string', 'max:100'],
             'components.*.batch_no' => ['nullable', 'string', 'max:100'],
+            'components.*.kolom' => ['nullable', 'string', 'max:10'],
+            'components.*.tingkat' => ['nullable', 'string', 'max:10'],
             'components.*.notes' => ['nullable', 'string', 'max:500'],
             'action' => ['nullable', 'string', 'in:save,print'],
         ], [
@@ -483,6 +517,8 @@ class PalletController extends Controller
                         'component_name' => trim($comp['component_name']),
                         'quantity' => ($comp['quantity'] ?? null) ?: '1',
                         'batch_no' => ($comp['batch_no'] ?? null) ?: $batchNo,
+                        'kolom' => ! empty($comp['kolom']) ? strtoupper(trim($comp['kolom'])) : null,
+                        'tingkat' => ! empty($comp['tingkat']) ? trim($comp['tingkat']) : null,
                         'notes' => $comp['notes'] ?? null,
                     ];
                 }
@@ -495,8 +531,24 @@ class PalletController extends Controller
                 'component_name' => $defaultMaterial,
                 'quantity' => ($validated['quantity'] ?? null) ?: '1 PALLET',
                 'batch_no' => $batchNo,
+                'kolom' => ! empty($validated['kolom']) ? strtoupper(trim($validated['kolom'])) : null,
+                'tingkat' => ! empty($validated['tingkat']) ? trim($validated['tingkat']) : null,
                 'notes' => $validated['notes'] ?? null,
             ];
+        }
+
+        // Determine pallet-level kolom & tingkat: from request or first non-empty component
+        $palletKolom = ! empty($validated['kolom']) ? strtoupper(trim($validated['kolom'])) : null;
+        $palletTingkat = ! empty($validated['tingkat']) ? trim($validated['tingkat']) : null;
+        if (! $palletKolom || ! $palletTingkat) {
+            foreach ($componentsData as $cd) {
+                if (! $palletKolom && ! empty($cd['kolom'])) {
+                    $palletKolom = $cd['kolom'];
+                }
+                if (! $palletTingkat && ! empty($cd['tingkat'])) {
+                    $palletTingkat = $cd['tingkat'];
+                }
+            }
         }
 
         $componentNames = array_column($componentsData, 'component_name');
@@ -504,7 +556,7 @@ class PalletController extends Controller
             ? implode(', ', $componentNames)
             : 'Standard Material';
 
-        DB::transaction(function () use ($sticker, $validated, $palletCode, $summaryMaterial, $batchNo, $componentsData) {
+        DB::transaction(function () use ($sticker, $validated, $palletCode, $summaryMaterial, $batchNo, $componentsData, $palletKolom, $palletTingkat) {
             $sticker->update([
                 'site' => $validated['site'],
                 'category' => $validated['category'],
@@ -513,6 +565,8 @@ class PalletController extends Controller
                 'material_name' => $summaryMaterial,
                 'batch_no' => $batchNo,
                 'quantity' => ($validated['quantity'] ?? null) ?: (string) count($componentsData),
+                'kolom' => $palletKolom,
+                'tingkat' => $palletTingkat,
                 'notes' => $validated['notes'] ?? null,
             ]);
 
@@ -548,10 +602,14 @@ class PalletController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('component_name', 'like', "%{$search}%")
                     ->orWhere('batch_no', 'like', "%{$search}%")
+                    ->orWhere('kolom', 'like', "%{$search}%")
+                    ->orWhere('tingkat', 'like', "%{$search}%")
                     ->orWhere('notes', 'like', "%{$search}%")
                     ->orWhereHas('palletSticker', function ($sub) use ($search) {
                         $sub->where('pallet_code', 'like', "%{$search}%")
                             ->orWhere('pallet_number', (int) $search)
+                            ->orWhere('kolom', 'like', "%{$search}%")
+                            ->orWhere('tingkat', 'like', "%{$search}%")
                             ->orWhere('notes', 'like', "%{$search}%");
                     });
             });

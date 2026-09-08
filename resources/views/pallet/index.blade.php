@@ -251,7 +251,6 @@
                         <th class="py-3 px-4">No. Pallet</th>
                         <th class="py-3 px-4">Nama Material</th>
                         <th class="py-3 px-4">Catatan</th>
-                        <th class="py-3 px-4">Jumlah</th>
                         <th class="py-3 px-4">Operator</th>
                         <th class="py-3 px-4">Waktu Pembuatan</th>
                         <th class="py-3 px-4 text-right">Aksi</th>
@@ -347,20 +346,22 @@
                                 @endif
                             </td>
 
-                            <!-- Catatan -->
+                            <!-- Catatan & Lokasi Rak -->
                             <td class="py-3.5 px-4">
-                                @if(!empty($noteText))
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 max-w-[200px] truncate" title="{{ $noteText }}">
-                                        {{ $noteText }}
-                                    </span>
-                                @else
-                                    <span class="text-slate-300 italic text-xs">&mdash;</span>
-                                @endif
-                            </td>
-
-                            <!-- Qty -->
-                            <td class="py-3.5 px-4 font-medium text-slate-700 whitespace-nowrap">
-                                {{ preg_replace('/\s*items?/i', '', $item->quantity ?: '1') }}
+                                <div class="flex flex-col gap-1 items-start">
+                                    @if(!empty($item->kolom) || !empty($item->tingkat))
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-mono font-extrabold bg-blue-50 text-blue-700 border border-blue-200 whitespace-nowrap">
+                                            {{ $item->kolom ? 'Kolom '.$item->kolom : '' }}{{ $item->kolom && $item->tingkat ? ' • ' : '' }}{{ $item->tingkat ? 'Tingkat '.$item->tingkat : '' }}
+                                        </span>
+                                    @endif
+                                    @if(!empty($noteText))
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 max-w-[200px] truncate" title="{{ $noteText }}">
+                                            {{ $noteText }}
+                                        </span>
+                                    @elseif(empty($item->kolom) && empty($item->tingkat))
+                                        <span class="text-slate-300 italic text-xs">&mdash;</span>
+                                    @endif
+                                </div>
                             </td>
 
                             <!-- Operator -->
@@ -423,7 +424,7 @@
                         </tr>
                     @empty
                         <tr id="emptyRow">
-                            <td colspan="10" class="py-14 text-center">
+                            <td colspan="9" class="py-14 text-center">
                                 <div class="max-w-xs mx-auto space-y-3">
                                     <div class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
                                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -442,7 +443,7 @@
                     
                     <!-- Dynamic No Results Message when filtered out -->
                     <tr id="noResultsFilteredRow" class="hidden">
-                        <td colspan="10" class="py-14 text-center">
+                        <td colspan="9" class="py-14 text-center">
                             <div class="max-w-xs mx-auto space-y-3">
                                 <div class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">

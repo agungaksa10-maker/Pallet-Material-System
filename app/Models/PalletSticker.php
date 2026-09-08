@@ -18,6 +18,8 @@ class PalletSticker extends Model
         'material_name',
         'batch_no',
         'quantity',
+        'kolom',
+        'tingkat',
         'notes',
         'user_id',
         'printed_at',

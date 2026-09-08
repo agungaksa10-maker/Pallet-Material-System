@@ -15,6 +15,8 @@ class PalletComponent extends Model
         'component_name',
         'quantity',
         'batch_no',
+        'kolom',
+        'tingkat',
         'notes',
     ];
 

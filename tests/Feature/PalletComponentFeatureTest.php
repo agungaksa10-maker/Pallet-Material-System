@@ -365,4 +365,106 @@ class PalletComponentFeatureTest extends TestCase
         $response->assertDontSee('INV-T0001-ISC');
         $response->assertDontSee('SELECT SPARE PARTS (FROM SOURCE SITE)');
     }
+
+    public function test_can_create_and_update_pallet_with_kolom_and_tingkat(): void
+    {
+        $response = $this->actingAs($this->user)->post('/pallet', [
+            'site' => 'OKI II',
+            'category' => 'Dressing',
+            'pallet_number' => 12,
+            'kolom' => 'B',
+            'tingkat' => '3',
+            'components' => [
+                [
+                    'component_name' => 'TURNKNIFE TK IV',
+                    'quantity' => '5',
+                    'batch_no' => 'BATCH-001',
+                    'kolom' => 'B',
+                    'tingkat' => '3',
+                ],
+                [
+                    'component_name' => 'ROLL DRESSING',
+                    'quantity' => '2',
+                    'batch_no' => 'BATCH-002',
+                    'kolom' => 'C',
+                    'tingkat' => '4',
+                ],
+            ],
+            'action' => 'save',
+        ]);
+
+        $response->assertRedirect();
+
+        $sticker = PalletSticker::where('site', 'OKI II')
+            ->where('pallet_number', 12)
+            ->first();
+
+        $this->assertNotNull($sticker);
+        $this->assertEquals('B', $sticker->kolom);
+        $this->assertEquals('3', $sticker->tingkat);
+
+        $this->assertDatabaseHas('pallet_components', [
+            'pallet_sticker_id' => $sticker->id,
+            'component_name' => 'TURNKNIFE TK IV',
+            'kolom' => 'B',
+            'tingkat' => '3',
+        ]);
+
+        $this->assertDatabaseHas('pallet_components', [
+            'pallet_sticker_id' => $sticker->id,
+            'component_name' => 'ROLL DRESSING',
+            'kolom' => 'C',
+            'tingkat' => '4',
+        ]);
+
+        // Test updating
+        $updateResponse = $this->actingAs($this->user)->put("/pallet/{$sticker->id}", [
+            'site' => 'OKI II',
+            'category' => 'Dressing',
+            'pallet_number' => 12,
+            'kolom' => 'Z',
+            'tingkat' => '5',
+            'components' => [
+                [
+                    'component_name' => 'TURNKNIFE TK IV UPDATED',
+                    'quantity' => '10',
+                    'batch_no' => 'BATCH-001-UPD',
+                    'kolom' => 'Z',
+                    'tingkat' => '5',
+                ],
+            ],
+            'action' => 'save',
+        ]);
+
+        $updateResponse->assertRedirect("/pallet/{$sticker->id}");
+
+        $sticker->refresh();
+        $this->assertEquals('Z', $sticker->kolom);
+        $this->assertEquals('5', $sticker->tingkat);
+
+        $this->assertDatabaseHas('pallet_components', [
+            'pallet_sticker_id' => $sticker->id,
+            'component_name' => 'TURNKNIFE TK IV UPDATED',
+            'kolom' => 'Z',
+            'tingkat' => '5',
+        ]);
+
+        // Test show page displays rack location
+        $showResponse = $this->actingAs($this->user)->get("/pallet/{$sticker->id}");
+        $showResponse->assertStatus(200);
+        $showResponse->assertSee('Kolom Z');
+        $showResponse->assertSee('Tingkat 5');
+    }
+
+    public function test_create_view_renders_kolom_and_tingkat_dropdowns(): void
+    {
+        $response = $this->actingAs($this->user)->get('/pallet/create');
+        $response->assertStatus(200);
+        $response->assertSee('newPartKolom', false);
+        $response->assertSee('newPartTingkat', false);
+        $response->assertSee('<option value="A">A</option>', false);
+        $response->assertSee('<option value="Z">Z</option>', false);
+        $response->assertSee('<option value="1">1</option>', false);
+        $response->assertSee('<option value="5">5</option>', false);
+    }
 }
